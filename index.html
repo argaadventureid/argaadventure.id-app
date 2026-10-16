@@ -127,7 +127,6 @@
       const signInButton = document.querySelector("#signin");
       const userBox = document.querySelector("#user");
       const emailBox = document.querySelector("#email");
-      const accessFrame = document.querySelector("#access-frame");
 
       const auth = getAuth(initializeApp(firebaseConfig));
       const provider = new GoogleAuthProvider();
@@ -154,7 +153,11 @@
               /^https:\/\/(?:[a-z0-9-]+-)?script\.googleusercontent\.com$/i.test(event.origin) ||
               event.origin === "https://script.google.com";
 
-            if (event.source !== accessFrame.contentWindow || !trustedAppsScriptOrigin) {
+            // PERBAIKAN: pengecekan event.source dihapus. Pesan datang dari
+            // iframe sandbox Google di dalam access-frame, jadi source-nya
+            // bukan accessFrame.contentWindow. Keamanan tetap dijaga oleh
+            // pengecekan origin dan nonce acak di bawah.
+            if (!trustedAppsScriptOrigin) {
               return;
             }
 
