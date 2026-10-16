@@ -6,7 +6,7 @@
     <title>Internal Portal - Arga Adventure</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Firebase SDK (Compat version untuk kemudahan implementasi) -->
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 </head>
@@ -15,13 +15,13 @@
     <!-- CONTAINER UTAMA (FULL SCREEN) -->
     <div id="app" class="flex-1 flex flex-col w-full">
 
-        <!-- 1. TAMPILAN LOADING / INISIALISASI -->
+        <!-- 1. TAMPILAN LOADING -->
         <div id="view-loading" class="hidden flex-1 flex flex-col justify-center items-center p-4">
             <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-emerald-800 border-t-transparent mb-2"></div>
             <p class="text-sm text-slate-500">Memeriksa sesi...</p>
         </div>
 
-        <!-- 2. TAMPILAN LOGIN (Disembunyikan default) -->
+        <!-- 2. TAMPILAN LOGIN -->
         <div id="view-login" class="hidden flex-1 flex flex-col justify-center items-center p-4">
             <div class="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 border border-slate-200 text-center">
                 <div class="mb-6">
@@ -29,23 +29,15 @@
                     <h1 class="text-2xl font-bold mt-2 text-slate-900">Arga Adventure</h1>
                     <p class="text-sm text-slate-500 mt-1">Silakan masuk menggunakan akun resmi tim.</p>
                 </div>
-                
                 <button id="btn-login" onclick="loginWithGoogle()" class="w-full flex items-center justify-center gap-3 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-medium py-2.5 px-4 rounded-xl transition shadow-sm">
-                    <svg class="w-5 h-5" viewBox="0 0 24 24">
-                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-                    </svg>
                     Masuk dengan Google
                 </button>
-                <p id="login-error" class="text-xs text-red-500 mt-4 hidden"></p>
             </div>
         </div>
 
-        <!-- 3. TAMPILAN DASHBOARD ADMIN (FULL SCREEN) -->
+        <!-- 3. TAMPILAN DASHBOARD & CRM (FULL SCREEN) -->
         <div id="view-admin" class="flex-1 flex flex-col w-full bg-slate-50">
-            <!-- Header Dashboard Full-Screen (Tanpa Garis Orange) -->
+            <!-- Header Dashboard Full-Screen -->
             <header class="bg-[#14362b] text-white px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4 shadow-md">
                 <div class="flex items-center gap-6 w-full md:w-auto justify-between md:justify-start">
                     <div class="flex items-center gap-3">
@@ -60,10 +52,10 @@
 
                     <!-- Menu Navigasi Utama -->
                     <nav class="hidden md:flex items-center gap-2 bg-[#0e261e] p-1.5 rounded-xl border border-emerald-900/50">
-                        <button class="bg-amber-600 text-white text-xs font-semibold px-3.5 py-1.5 rounded-lg transition shadow-sm">Dashboard</button>
-                        <button class="hover:bg-white/10 text-slate-200 hover:text-white text-xs font-medium px-3.5 py-1.5 rounded-lg transition">CRM</button>
-                        <button class="hover:bg-white/10 text-slate-200 hover:text-white text-xs font-medium px-3.5 py-1.5 rounded-lg transition">Trip Event</button>
-                        <button class="hover:bg-white/10 text-slate-200 hover:text-white text-xs font-medium px-3.5 py-1.5 rounded-lg transition">Finance</button>
+                        <button id="nav-dashboard" onclick="switchTab('dashboard')" class="bg-amber-600 text-white text-xs font-semibold px-3.5 py-1.5 rounded-lg transition shadow-sm">Dashboard</button>
+                        <button id="nav-crm" onclick="switchTab('crm')" class="hover:bg-white/10 text-slate-200 hover:text-white text-xs font-medium px-3.5 py-1.5 rounded-lg transition">CRM</button>
+                        <button id="nav-trip" onclick="switchTab('trip')" class="hover:bg-white/10 text-slate-200 hover:text-white text-xs font-medium px-3.5 py-1.5 rounded-lg transition">Trip Event</button>
+                        <button id="nav-finance" onclick="switchTab('finance')" class="hover:bg-white/10 text-slate-200 hover:text-white text-xs font-medium px-3.5 py-1.5 rounded-lg transition">Finance</button>
                     </nav>
                 </div>
                 
@@ -73,113 +65,203 @@
                 </div>
             </header>
 
-            <!-- Mobile Navigasi (Baris kedua untuk layar kecil) -->
-            <div class="md:hidden flex items-center justify-around bg-[#0e261e] text-white py-2.5 border-b border-emerald-900">
-                <button class="text-amber-400 text-xs font-semibold">Dashboard</button>
-                <button class="text-slate-300 text-xs font-medium">CRM</button>
-                <button class="text-slate-300 text-xs font-medium">Trip Event</button>
-                <button class="text-slate-300 text-xs font-medium">Finance</button>
-            </div>
-
-            <!-- Konten Utama Admin (Full Width Grid) -->
-            <main class="flex-1 p-6 md:p-8 space-y-6 max-w-7xl mx-auto w-full">
-                <!-- 3 Kartu dengan Efek 3D Depth & Hover Animation -->
+            <!-- KONTEN TAB: DASHBOARD -->
+            <main id="tab-dashboard-content" class="flex-1 p-6 md:p-8 space-y-6 max-w-7xl mx-auto w-full">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <!-- Kartu 1 -->
-                    <div class="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.08),0_8px_10px_-6px_rgba(0,0,0,0.08)] transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_20px_35px_-10px_rgba(0,0,0,0.12)] cursor-pointer">
+                    <div class="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.08)] transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_20px_35px_-10px_rgba(0,0,0,0.12)] cursor-pointer">
                         <h3 class="text-emerald-900 font-semibold text-sm">Status Sistem</h3>
                         <p class="text-3xl font-bold text-emerald-800 mt-2">Aktif & Terhubung</p>
                         <p class="text-xs text-slate-500 mt-2">Sinkronisasi Google Sheet Lancar</p>
                     </div>
-                    <!-- Kartu 2 -->
-                    <div class="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.08),0_8px_10px_-6px_rgba(0,0,0,0.08)] transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_20px_35px_-10px_rgba(0,0,0,0.12)] cursor-pointer">
+                    <div class="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.08)] transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_20px_35px_-10px_rgba(0,0,0,0.12)] cursor-pointer">
                         <h3 class="text-blue-900 font-semibold text-sm">Hak Akses</h3>
                         <p class="text-3xl font-bold text-blue-800 mt-2">Administrator</p>
                         <p class="text-xs text-slate-500 mt-2">Akses penuh modul operasional</p>
                     </div>
-                    <!-- Kartu 3 -->
-                    <div class="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.08),0_8px_10px_-6px_rgba(0,0,0,0.08)] transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_20px_35px_-10px_rgba(0,0,0,0.12)]">
+                    <div class="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.08)] transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_20px_35px_-10px_rgba(0,0,0,0.12)]">
                         <h3 class="text-amber-900 font-semibold text-sm">Aksi Cepat</h3>
                         <div class="mt-4 flex gap-2">
-                            <button class="bg-amber-600 hover:bg-amber-700 text-white text-xs px-3.5 py-2 rounded-xl font-medium transition shadow-sm">+ Buat Trip Baru</button>
-                            <button class="bg-slate-800 hover:bg-slate-900 text-white text-xs px-3.5 py-2 rounded-xl font-medium transition shadow-sm">Kelola Whitelist</button>
+                            <button onclick="switchTab('crm')" class="bg-amber-600 hover:bg-amber-700 text-white text-xs px-3.5 py-2 rounded-xl font-medium transition shadow-sm">+ Kelola Leads CRM</button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Area Kerja / Tabel Data Full Width -->
                 <div class="border border-slate-200/80 rounded-2xl p-6 bg-white shadow-[0_10px_25px_-5px_rgba(0,0,0,0.08)] min-h-[400px]">
                     <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-100">
                         <h3 class="font-bold text-slate-800 text-lg flex items-center gap-2">
                             <span class="w-2.5 h-2.5 rounded-full bg-amber-600"></span>
-                            Aktivitas & Kontrol Akses Terakhir
+                            Ringkasan Aktivitas
                         </h3>
                         <span class="text-xs text-emerald-800 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-lg font-medium">Live Data from Google Sheet</span>
                     </div>
-                    <p class="text-sm text-slate-500">Modul manajemen operasional, data pelanggan CRM, penjadwalan Trip Event, dan pencatatan Finance akan dimuat di area ini secara dinamis.</p>
+                    <p class="text-sm text-slate-500">Pilih menu **CRM** di header atas untuk mengelola data leads dan riwayat follow-up secara terstruktur.</p>
                 </div>
             </main>
-        </div>
 
-        <!-- 4. TAMPILAN AKSES DITOLAK -->
-        <div id="view-unauthorized" class="hidden flex-1 flex flex-col justify-center items-center p-4">
-            <div class="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 border border-slate-200 text-center">
-                <div class="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">!</div>
-                <h2 class="text-xl font-bold text-slate-900">Akses Ditolak</h2>
-                <p class="text-sm text-slate-500 mt-2">Akun Google Anda tidak terdaftar atau tidak aktif di daftar akses internal Arga Adventure.</p>
-                <button onclick="logout()" class="mt-6 bg-slate-900 hover:bg-slate-800 text-white text-sm px-4 py-2 rounded-xl transition">Ganti Akun / Keluar</button>
-            </div>
-        </div>
+            <!-- KONTEN TAB: CRM (MODUL CRM LENGKAP) -->
+            <main id="tab-crm-content" class="hidden flex-1 p-6 md:p-8 space-y-6 max-w-7xl mx-auto w-full">
+                <!-- Header CRM & Filter -->
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.08)]">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900">CRM - Customer & Leads Management</h2>
+                        <p class="text-xs text-slate-500 mt-1">Mengelola pipeline calon pendaki & riwayat kontak terintegrasi Tab `CRM` dan `CRM Follow-up`</p>
+                    </div>
+                    <button class="bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition shadow-sm flex items-center gap-2">
+                        <span>+ Tambah Lead Baru</span>
+                    </button>
+                </div>
 
+                <!-- Area Kerja CRM (Tabel Leads & Panel Detail Follow-up) -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    
+                    <!-- Tabel Data Leads (Mengambil 2 Kolom Layar) -->
+                    <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200/80 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.08)] p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-slate-800">Daftar Leads Aktif</h3>
+                            <input type="text" placeholder="Cari Nama / No WA / Tujuan..." class="text-xs bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-emerald-600">
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-50 text-slate-600 uppercase font-semibold border-b border-slate-200">
+                                        <th class="p-3">Nama Lead</th>
+                                        <th class="p-3">Tujuan</th>
+                                        <th class="p-3">Pax</th>
+                                        <th class="p-3">Status Pipeline</th>
+                                        <th class="p-3">PIC</th>
+                                        <th class="p-3 text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100">
+                                    <tr class="hover:bg-slate-50 cursor-pointer transition" onclick="selectLead('LEAD-001', 'Budi Santoso', 'Prau (Dieng)', '4 Pax', 'Warm Lead', 'Dimas')">
+                                        <td class="p-3 font-semibold text-slate-900">
+                                            Budi Santoso
+                                            <div class="text-[10px] text-slate-400 font-normal">+628123456789 (Jakarta)</div>
+                                        </td>
+                                        <td class="p-3">Prau (Dieng)</td>
+                                        <td class="p-3">4 Pax</td>
+                                        <td class="p-3"><span class="bg-amber-100 text-amber-800 font-semibold px-2 py-0.5 rounded-full text-[10px]">Warm Lead</span></td>
+                                        <td class="p-3">Dimas</td>
+                                        <td class="p-3 text-center">
+                                            <a href="https://wa.me/628123456789" target="_blank" onclick="event.stopPropagation()" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-2.5 py-1 rounded-lg text-[10px] font-semibold inline-flex items-center gap-1">WA</a>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-slate-50 cursor-pointer transition" onclick="selectLead('LEAD-002', 'Siti Rahma', 'Annapurna BC', '2 Pax', 'Hot Lead', 'Arga')">
+                                        <td class="p-3 font-semibold text-slate-900">
+                                            Siti Rahma
+                                            <div class="text-[10px] text-slate-400 font-normal">+628987654321 (Bandung)</div>
+                                        </td>
+                                        <td class="p-3">Annapurna BC</td>
+                                        <td class="p-3">2 Pax</td>
+                                        <td class="p-3"><span class="bg-red-100 text-red-800 font-semibold px-2 py-0.5 rounded-full text-[10px]">Hot Lead</span></td>
+                                        <td class="p-3">Arga</td>
+                                        <td class="p-3 text-center">
+                                            <a href="https://wa.me/628987654321" target="_blank" onclick="event.stopPropagation()" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-2.5 py-1 rounded-lg text-[10px] font-semibold inline-flex items-center gap-1">WA</a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Panel Riwayat Follow-up (Terhubung via ID Lead) -->
+                    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.08)] p-6 flex flex-col justify-between">
+                        <div>
+                            <div class="pb-3 border-b border-slate-100 mb-4">
+                                <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md font-mono" id="selected-lead-id">ID Lead: LEAD-001</span>
+                                <h3 class="font-bold text-slate-900 text-base mt-1" id="selected-lead-name">Budi Santoso</h3>
+                                <p class="text-xs text-slate-500" id="selected-lead-info">Tujuan: Prau (Dieng) • 4 Pax</p>
+                            </div>
+
+                            <!-- Timeline Follow-up -->
+                            <h4 class="text-xs font-semibold text-slate-700 uppercase tracking-wider mb-3">Riwayat Follow-up</h4>
+                            <div class="space-y-3 max-h-[250px] overflow-y-auto pr-1" id="followup-timeline">
+                                <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-xs">
+                                    <div class="flex justify-between font-semibold text-slate-700">
+                                        <span>Dimas</span>
+                                        <span class="text-[10px] text-slate-400">16 Oct 2026</span>
+                                    </div>
+                                    <p class="text-slate-600 mt-1">Sudah dikirimkan estimasi budget private trip 4 pax. Menunggu konfirmasi tanggal pasti.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Tambah Catatan Follow-up -->
+                        <div class="mt-6 pt-4 border-t border-slate-100">
+                            <textarea id="input-followup" rows="2" placeholder="Tulis catatan follow-up baru..." class="w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600"></textarea>
+                            <button onclick="addFollowup()" class="w-full mt-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold py-2 rounded-xl transition shadow-sm">+ Simpan Catatan Follow-up</button>
+                        </div>
+                    </div>
+
+                </div>
+            </main>
+
+        </div>
     </div>
 
-    <!-- SCRIPT KONFIGURASI & LOGIKA -->
+    <!-- SCRIPT KONFIGURASI & LOGIKA NAVIGASI TAB -->
     <script>
         const firebaseConfig = {
             apiKey: "GANTI_DENGAN_API_KEY_FIREBASE",
             authDomain: "GANTI_DENGAN_AUTH_DOMAIN",
             projectId: "GANTI_DENGAN_PROJECT_ID"
         };
-
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
-        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycb.../exec";
 
-        const viewLoading = document.getElementById('view-loading');
-        const viewLogin = document.getElementById('view-login');
         const viewAdmin = document.getElementById('view-admin');
-        const viewUnauthorized = document.getElementById('view-unauthorized');
-        const loginError = document.getElementById('login-error');
-        const userEmailDisplay = document.getElementById('user-email-display');
+        const tabDashboard = document.getElementById('tab-dashboard-content');
+        const tabCrm = document.getElementById('tab-crm-content');
 
-        function switchView(viewName) {
-            viewLoading.classList.add('hidden');
-            viewLogin.classList.add('hidden');
-            viewAdmin.classList.add('hidden');
-            viewUnauthorized.classList.add('hidden');
+        const navDashboard = document.getElementById('nav-dashboard');
+        const navCrm = document.getElementById('nav-crm');
 
-            if (viewName === 'loading') viewLoading.classList.remove('hidden');
-            if (viewName === 'login') viewLogin.classList.remove('hidden');
-            if (viewName === 'admin') viewAdmin.classList.remove('hidden');
-            if (viewName === 'unauthorized') viewUnauthorized.classList.remove('hidden');
+        // FUNGSI PINDAH TAB (DASHBOARD <-> CRM)
+        function switchTab(tabName) {
+            tabDashboard.classList.add('hidden');
+            tabCrm.classList.add('hidden');
+
+            navDashboard.className = "hover:bg-white/10 text-slate-200 hover:text-white text-xs font-medium px-3.5 py-1.5 rounded-lg transition";
+            navCrm.className = "hover:bg-white/10 text-slate-200 hover:text-white text-xs font-medium px-3.5 py-1.5 rounded-lg transition";
+
+            if (tabName === 'dashboard') {
+                tabDashboard.classList.remove('hidden');
+                navDashboard.className = "bg-amber-600 text-white text-xs font-semibold px-3.5 py-1.5 rounded-lg transition shadow-sm";
+            } else if (tabName === 'crm') {
+                tabCrm.classList.remove('hidden');
+                navCrm.className = "bg-amber-600 text-white text-xs font-semibold px-3.5 py-1.5 rounded-lg transition shadow-sm";
+            }
         }
 
-        // PAKSA TAMPILKAN DASHBOARD ADMIN FULL-SCREEN UNTUK UI PREVIEW
-        switchView('admin');
-
-        function loginWithGoogle() {
-            loginError.classList.add('hidden');
-            const provider = new firebase.auth.GoogleAuthProvider();
-            auth.signInWithPopup(provider).catch((error) => {
-                loginError.textContent = error.message;
-                loginError.classList.remove('hidden');
-            });
+        // FUNGSI PILIH LEAD DI TABEL (TAMPILKAN DETAIL & FOLLOW-UP)
+        function selectLead(id, name, destination, pax, status, pic) {
+            document.getElementById('selected-lead-id').textContent = 'ID Lead: ' + id;
+            document.getElementById('selected-lead-name').textContent = name;
+            document.getElementById('selected-lead-info').textContent = 'Tujuan: ' + destination + ' • ' + pax;
         }
 
-        function logout() {
-            auth.signOut();
-            switchView('login');
+        function addFollowup() {
+            const input = document.getElementById('input-followup');
+            if (!input.value.trim()) return;
+            
+            const timeline = document.getElementById('followup-timeline');
+            const newCard = document.createElement('div');
+            newCard.className = "bg-slate-50 p-3 rounded-xl border border-slate-100 text-xs";
+            newCard.innerHTML = `
+                <div class="flex justify-between font-semibold text-slate-700">
+                    <span>Admin</span>
+                    <span class="text-[10px] text-slate-400">Hari Ini</span>
+                </div>
+                <p class="text-slate-600 mt-1">${input.value}</p>
+            `;
+            timeline.prepend(newCard);
+            input.value = '';
         }
+
+        // DEFAULT PREVIEW
+        document.getElementById('view-loading').classList.add('hidden');
+        viewAdmin.classList.remove('hidden');
     </script>
 </body>
 </html>
