@@ -1,405 +1,189 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0b352b">
-  <title>Arga 2.0 | Internal</title>
-  <style>
-    :root {
-      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: #18352d;
-      background: #f3f6f1;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      padding: 24px;
-    }
-    main {
-      width: min(100%, 1600px);
-      background: #fff;
-      border: 1px solid #e2e9e2;
-      border-radius: 20px;
-      padding: 32px;
-      box-shadow: 0 18px 55px #17352b12;
-    }
-    .mark {
-      width: 48px;
-      height: 48px;
-      display: grid;
-      place-items: center;
-      border-radius: 15px;
-      background: #0b352b;
-      color: #fff;
-      font-weight: 800;
-    }
-    h1 { font-size: 25px; margin: 22px 0 8px; }
-    p { color: #5c7069; line-height: 1.55; margin: 0 0 20px; }
-    button {
-      min-height: 48px;
-      border: 1px solid #d6dfd9;
-      border-radius: 10px;
-      background: #fff;
-      color: #18352d;
-      font-size: 15px;
-      font-weight: 650;
-      cursor: pointer;
-    }
-    button:hover { background: #f7faf7; }
-    button:disabled { opacity: .6; cursor: wait; }
-    #signin, #signout { width: 100%; }
-    #status {
-      display: none;
-      margin-top: 18px;
-      border-radius: 10px;
-      padding: 13px 14px;
-      font-size: 14px;
-      line-height: 1.5;
-    }
-    #status.visible { display: block; }
-    #status.info { background: #eef5f0; color: #315a49; }
-    #status.error { background: #fff0ed; color: #8a3023; }
-    #user {
-      display: none;
-      margin-top: 18px;
-      border-top: 1px solid #e8ede9;
-      padding-top: 18px;
-      font-size: 14px;
-      color: #5c7069;
-    }
-    #user.visible { display: block; }
-    #signout { margin-top: 12px; }
-    #dashboard { margin-top: 28px; }
-    #dashboard[hidden], #crm-view[hidden] { display: none; }
-    .modules {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-      gap: 14px;
-      margin-bottom: 20px;
-    }
-    .module {
-      border: 1px solid #e2e9e2;
-      border-radius: 14px;
-      padding: 18px;
-      background: #fbfcfa;
-    }
-    .module h2 { font-size: 17px; margin: 0 0 8px; }
-    .module p { font-size: 13px; margin: 0; }
-    .module-action {
-      width: 100%;
-      min-height: 130px;
-      text-align: left;
-    }
-    .module-action h2, .module-action p { pointer-events: none; }
-    .note { font-size: 12px; margin: 22px 0 0; }
-    .crm-heading {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      margin: 24px 0 14px;
-    }
-    .crm-heading h2 { margin: 0; }
-    #back-dashboard { padding: 0 16px; }
-    .table-scroll {
-      overflow: auto;
-      border: 1px solid #e2e9e2;
-      border-radius: 12px;
-    }
-    table { border-collapse: collapse; min-width: 900px; width: 100%; }
-    th, td {
-      border-bottom: 1px solid #e8ede9;
-      padding: 10px 12px;
-      text-align: left;
-      font-size: 13px;
-      vertical-align: top;
-      white-space: pre-wrap;
-    }
-    th { background: #f3f6f1; }
-    @media (max-width: 600px) {
-      main { padding: 22px; }
-      .crm-heading { align-items: flex-start; flex-direction: column; }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Internal Portal - Arga Adventure</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Firebase SDK (Compat version untuk kemudahan implementasi) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 </head>
-<body>
-  <main>
-    <div class="mark" aria-hidden="true">A</div>
-    <h1>Arga 2.0</h1>
-    <p>Masuk dengan akun Google yang didaftarkan untuk tim Arga Adventure.</p>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
 
-    <button id="signin" type="button">Masuk dengan Google</button>
-    <div id="status" role="status" aria-live="polite"></div>
+    <!-- CONTAINER UTAMA -->
+    <div id="app" class="flex-1 flex flex-col justify-center items-center p-4">
 
-    <div id="user">
-      <span id="email"></span>
-      <button id="signout" type="button">Keluar</button>
+        <!-- 1. TAMPILAN LOADING / INISIALISASI -->
+        <div id="view-loading" class="text-center">
+            <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-emerald-600 border-t-transparent mb-2"></div>
+            <p class="text-sm text-slate-500">Memeriksa sesi...</p>
+        </div>
+
+        <!-- 2. TAMPILAN LOGIN (Disembunyikan default) -->
+        <div id="view-login" class="hidden max-w-md w-full bg-white rounded-2xl shadow-xl p-8 border border-slate-100 text-center">
+            <div class="mb-6">
+                <span class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">Arga 2.0 Internal</span>
+                <h1 class="text-2xl font-bold mt-2 text-slate-900">Arga Adventure</h1>
+                <p class="text-sm text-slate-500 mt-1">Silakan masuk menggunakan akun resmi tim.</p>
+            </div>
+            
+            <button id="btn-login" onclick="loginWithGoogle()" class="w-full flex items-center justify-center gap-3 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-medium py-2.5 px-4 rounded-xl transition shadow-sm">
+                <svg class="w-5 h-5" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                </svg>
+                Masuk dengan Google
+            </button>
+            <p id="login-error" class="text-xs text-red-500 mt-4 hidden"></p>
+        </div>
+
+        <!-- 3. TAMPILAN DASHBOARD ADMIN (Disembunyikan default) -->
+        <div id="view-admin" class="hidden w-full max-w-6xl bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden my-6">
+            <!-- Header Dashboard -->
+            <header class="bg-slate-900 text-white px-6 py-4 flex justify-between items-center">
+                <div>
+                    <span class="text-xs text-emerald-400 font-semibold uppercase tracking-wider">Admin Panel</span>
+                    <h2 class="text-xl font-bold">Arga Adventure 2.0</h2>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span id="user-email-display" class="text-sm text-slate-300 hidden md:inline"></span>
+                    <button onclick="logout()" class="bg-slate-800 hover:bg-slate-700 text-sm px-3 py-1.5 rounded-lg transition border border-slate-700">Keluar</button>
+                </div>
+            </header>
+
+            <!-- Konten Utama Admin -->
+            <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Card Statistik / Ringkasan -->
+                <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-5">
+                    <h3 class="text-emerald-900 font-semibold text-sm">Status Sistem</h3>
+                    <p class="text-2xl font-bold text-emerald-700 mt-1">Aktif & Terhubung</p>
+                    <p class="text-xs text-emerald-600 mt-2">Sinkronisasi Google Sheet Lancar</p>
+                </div>
+                <div class="bg-blue-50 border border-blue-100 rounded-xl p-5">
+                    <h3 class="text-blue-900 font-semibold text-sm">Hak Akses</h3>
+                    <p class="text-2xl font-bold text-blue-700 mt-1">Administrator</p>
+                    <p class="text-xs text-blue-600 mt-2">Akses penuh modul operasional</p>
+                </div>
+                <div class="bg-amber-50 border border-amber-100 rounded-xl p-5">
+                    <h3 class="text-amber-900 font-semibold text-sm">Modul Cepat</h3>
+                    <div class="mt-3 flex gap-2">
+                        <button class="bg-amber-600 hover:bg-amber-700 text-white text-xs px-3 py-1.5 rounded-lg font-medium transition">Kelola Trip</button>
+                        <button class="bg-amber-600 hover:bg-amber-700 text-white text-xs px-3 py-1.5 rounded-lg font-medium transition">Whitelists</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Area Kerja / Tabel Data -->
+            <div class="px-6 pb-6">
+                <div class="border border-slate-200 rounded-xl p-6 bg-slate-50">
+                    <h3 class="font-bold text-slate-700 mb-2">Aktivitas & Kontrol Akses Terakhir</h3>
+                    <p class="text-sm text-slate-500">Modul manajemen user dari Google Sheet privat akan ditampilkan di sini.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. TAMPILAN AKSES DITOLAK (Jika email tidak terdaftar/aktif) -->
+        <div id="view-unauthorized" class="hidden max-w-md w-full bg-white rounded-2xl shadow-xl p-8 border border-slate-100 text-center">
+            <div class="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">!</div>
+            <h2 class="text-xl font-bold text-slate-900">Akses Ditolak</h2>
+            <p class="text-sm text-slate-500 mt-2">Akun Google Anda tidak terdaftar atau tidak aktif di daftar akses internal Arga Adventure.</p>
+            <button onclick="logout()" class="mt-6 bg-slate-900 hover:bg-slate-800 text-white text-sm px-4 py-2 rounded-xl transition">Ganti Akun / Keluar</button>
+        </div>
+
     </div>
 
-    <section id="dashboard" hidden>
-      <h2>Dashboard</h2>
-      <div id="module-menu" class="modules"></div>
-
-      <section id="crm-view" hidden>
-        <div class="crm-heading">
-          <h2>Data CRM</h2>
-          <button id="back-dashboard" type="button">Kembali</button>
-        </div>
-        <div id="crm-message" class="note"></div>
-        <div class="table-scroll">
-          <table>
-            <thead id="crm-head"></thead>
-            <tbody id="crm-body"></tbody>
-          </table>
-        </div>
-      </section>
-
-      <p class="note">Data CRM ditampilkan hanya untuk role yang memiliki akses.</p>
-    </section>
-  </main>
-
-  <iframe id="access-frame" name="access-frame"
-          title="Pemeriksaan akses Arga Adventure" hidden></iframe>
-
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-    import {
-      getAuth,
-      GoogleAuthProvider,
-      signInWithPopup,
-      signOut,
-      onAuthStateChanged
-    } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyBydyEGrTsFjL_icqKEiWj9AU1ZG3sQHqs",
-      authDomain: "arga-adventure-internal-app.firebaseapp.com",
-      projectId: "arga-adventure-internal-app",
-      appId: "1:830680121802:web:0e3a0175c4d59fb8468f33"
-    };
-
-    const ACCESS_CHECK_URL =
-      "https://script.google.com/macros/s/AKfycbxVahhCaebAZwZXBLjtLmIEvSyk0KGMG8mBGEJ3eboKhR9G-Bw_zPwMl5V2tA5MN0sRnA/exec";
-
-    const statusBox = document.querySelector("#status");
-    const signInButton = document.querySelector("#signin");
-    const userBox = document.querySelector("#user");
-    const emailBox = document.querySelector("#email");
-    const dashboard = document.querySelector("#dashboard");
-    const moduleMenu = document.querySelector("#module-menu");
-    const crmView = document.querySelector("#crm-view");
-    const crmMessage = document.querySelector("#crm-message");
-    const crmHead = document.querySelector("#crm-head");
-    const crmBody = document.querySelector("#crm-body");
-    const accessFrame = document.querySelector("#access-frame");
-
-    const auth = getAuth(initializeApp(firebaseConfig));
-    const provider = new GoogleAuthProvider();
-    let signedInUser = null;
-
-    function showStatus(message, type = "info") {
-      statusBox.textContent = message;
-      statusBox.className = `visible ${type}`;
-    }
-
-    function callBackend(user, action) {
-      return new Promise(async (resolve, reject) => {
-        let idToken;
-        try {
-          idToken = await user.getIdToken();
-        } catch (_error) {
-          reject(new Error("Sesi login tidak terbaca. Silakan masuk kembali."));
-          return;
-        }
-
-        const nonce = crypto.randomUUID().replaceAll("-", "");
-        const timeout = setTimeout(() => {
-          window.removeEventListener("message", onMessage);
-          reject(new Error("Pemeriksaan akses terlalu lama. Muat ulang halaman lalu coba lagi."));
-        }, 20000);
-
-        function onMessage(event) {
-          const trustedOrigin =
-            /^https:\/\/(?:[a-z0-9-]+-)?script\.googleusercontent\.com$/i.test(event.origin) ||
-            event.origin === "https://script.google.com";
-
-          if (!trustedOrigin) return;
-
-          const message = event.data;
-          if (!message || message.channel !== "arga-access" || message.nonce !== nonce) return;
-
-          clearTimeout(timeout);
-          window.removeEventListener("message", onMessage);
-          resolve(message.result);
-        }
-
-        window.addEventListener("message", onMessage);
-
-        const form = document.createElement("form");
-        form.method = "POST";
-        form.action = ACCESS_CHECK_URL;
-        form.target = "access-frame";
-        form.enctype = "application/x-www-form-urlencoded";
-
-        const fields = {
-          payload: JSON.stringify({ idToken, action }),
-          nonce
+    <!-- SCRIPT KONFIGURASI & LOGIKA -->
+    <script>
+        // --- KONFIGURASI FIREBASE ANDA ---
+        const firebaseConfig = {
+            apiKey: "GANTI_DENGAN_API_KEY_FIREBASE",
+            authDomain: "GANTI_DENGAN_AUTH_DOMAIN",
+            projectId: "GANTI_DENGAN_PROJECT_ID"
         };
 
-        for (const [name, value] of Object.entries(fields)) {
-          const input = document.createElement("input");
-          input.type = "hidden";
-          input.name = name;
-          input.value = value;
-          form.appendChild(input);
+        // Inisialisasi Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        // URL Web App Google Apps Script Anda
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycb.../exec";
+
+        // DOM Elements
+        const viewLoading = document.getElementById('view-loading');
+        const viewLogin = document.getElementById('view-login');
+        const viewAdmin = document.getElementById('view-admin');
+        const viewUnauthorized = document.getElementById('view-unauthorized');
+        const loginError = document.getElementById('login-error');
+        const userEmailDisplay = document.getElementById('user-email-display');
+
+        function switchView(viewName) {
+            viewLoading.classList.add('hidden');
+            viewLogin.classList.add('hidden');
+            viewAdmin.classList.add('hidden');
+            viewUnauthorized.classList.add('hidden');
+
+            if (viewName === 'loading') viewLoading.classList.remove('hidden');
+            if (viewName === 'login') viewLogin.classList.remove('hidden');
+            if (viewName === 'admin') viewAdmin.classList.remove('hidden');
+            if (viewName === 'unauthorized') viewUnauthorized.classList.remove('hidden');
         }
 
-        document.body.appendChild(form);
-        form.submit();
-        form.remove();
-      });
-    }
+        // Pantau status auth Firebase
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                switchView('loading');
+                try {
+                    // Ambil ID Token Firebase
+                    const idToken = await user.getIdToken();
 
-    function showDashboard(role) {
-      moduleMenu.replaceChildren();
+                    // Kirim ke Google Apps Script untuk divalidasi dengan Google Sheet
+                    const response = await fetch(APPS_SCRIPT_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({ token: idToken })
+                    });
+                    
+                    const result = await response.json();
 
-      if (role === "Admin" || role === "CRM") {
-        const crmButton = document.createElement("button");
-        crmButton.type = "button";
-        crmButton.id = "open-crm";
-        crmButton.className = "module module-action";
-
-        const title = document.createElement("h2");
-        title.textContent = "CRM";
-        const description = document.createElement("p");
-        description.textContent = "Lihat data lead dan tindak lanjut.";
-        crmButton.append(title, description);
-        moduleMenu.appendChild(crmButton);
-      }
-
-      const otherModules = [];
-      if (role === "Admin" || role === "Trip & Event") {
-        otherModules.push({
-          title: "Trip & Event",
-          description: "Informasi perjalanan dan acara."
+                    if (result.status === 'success' && result.active === true) {
+                        if (result.role === 'admin') {
+                            userEmailDisplay.textContent = user.email;
+                            switchView('admin');
+                        } else {
+                            // Skenario role lain (misal: guide/staff) bisa diarahkan ke view lain di sini
+                            switchView('unauthorized'); 
+                        }
+                    } else {
+                        switchView('unauthorized');
+                    }
+                } catch (error) {
+                    console.error("Gagal verifikasi backend:", error);
+                    loginError.textContent = "Terjadi kesalahan koneksi ke server verifikasi.";
+                    loginError.classList.remove('hidden');
+                    switchView('login');
+                }
+            } else {
+                switchView('login');
+            }
         });
-      }
-      if (role === "Admin" || role === "Finance") {
-        otherModules.push({
-          title: "Finance",
-          description: "Informasi dan pencatatan keuangan."
-        });
-      }
 
-      otherModules.forEach(item => {
-        const card = document.createElement("article");
-        card.className = "module";
-        const title = document.createElement("h2");
-        title.textContent = item.title;
-        const description = document.createElement("p");
-        description.textContent = item.description;
-        card.append(title, description);
-        moduleMenu.appendChild(card);
-      });
-
-      dashboard.hidden = false;
-    }
-
-    async function checkTeamAccess(user) {
-      const result = await callBackend(user, "checkAccess");
-
-      if (!result || result.allowed !== true) {
-        throw new Error((result && result.message) || "Akun ini belum mendapat izin dari Admin Arga.");
-      }
-
-      showStatus(`Akses disetujui · Role: ${result.role}`);
-      showDashboard(result.role);
-    }
-
-    async function loadCrm() {
-      crmView.hidden = false;
-      moduleMenu.hidden = true;
-      crmMessage.textContent = "Memuat data CRM…";
-      crmHead.replaceChildren();
-      crmBody.replaceChildren();
-
-      try {
-        const result = await callBackend(signedInUser, "crmList");
-        if (!result || result.allowed !== true) {
-          throw new Error((result && result.message) || "Data CRM tidak dapat dibuka.");
+        // Fungsi Tombol Login Google
+        function loginWithGoogle() {
+            loginError.classList.add('hidden');
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider).catch((error) => {
+                loginError.textContent = error.message;
+                loginError.classList.remove('hidden');
+            });
         }
 
-        const headerRow = document.createElement("tr");
-        result.headers.forEach(value => {
-          const th = document.createElement("th");
-          th.textContent = value;
-          headerRow.appendChild(th);
-        });
-        crmHead.appendChild(headerRow);
-
-        result.rows.forEach(row => {
-          const tr = document.createElement("tr");
-          row.forEach(value => {
-            const td = document.createElement("td");
-            td.textContent = value;
-            tr.appendChild(td);
-          });
-          crmBody.appendChild(tr);
-        });
-
-        crmMessage.textContent = result.rows.length
-          ? `Menampilkan ${result.rows.length} lead pertama${result.hasMore ? " (data lainnya belum ditampilkan)." : "."}`
-          : "Belum ada data CRM.";
-      } catch (error) {
-        crmMessage.textContent = error.message;
-      }
-    }
-
-    moduleMenu.addEventListener("click", event => {
-      if (event.target.closest("#open-crm")) loadCrm();
-    });
-
-    document.querySelector("#back-dashboard").addEventListener("click", () => {
-      crmView.hidden = true;
-      moduleMenu.hidden = false;
-    });
-
-    signInButton.addEventListener("click", async () => {
-      signInButton.disabled = true;
-      try {
-        await signInWithPopup(auth, provider);
-      } catch (error) {
-        showStatus(error.message || "Login tidak berhasil. Silakan coba lagi.", "error");
-      } finally {
-        signInButton.disabled = false;
-      }
-    });
-
-    document.querySelector("#signout").addEventListener("click", () => signOut(auth));
-
-    onAuthStateChanged(auth, async user => {
-      signedInUser = user;
-      userBox.classList.toggle("visible", Boolean(user));
-      signInButton.hidden = Boolean(user);
-      dashboard.hidden = true;
-      crmView.hidden = true;
-      moduleMenu.hidden = false;
-
-      if (user) {
-        emailBox.textContent = user.email || "Akun Google";
-        try {
-          await checkTeamAccess(user);
-        } catch (error) {
-          showStatus(error.message, "error");
+        // Fungsi Logout
+        function logout() {
+            auth.signOut();
         }
-      } else {
-        statusBox.className = "";
-      }
-    });
-  </script>
+    </script>
 </body>
 </html>
