@@ -16,7 +16,7 @@
     <div id="app" class="flex-1 flex flex-col justify-center items-center p-4">
 
         <!-- 1. TAMPILAN LOADING / INISIALISASI -->
-        <div id="view-loading" class="hidden text-center\">
+        <div id="view-loading" class="hidden text-center">
             <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-emerald-600 border-t-transparent mb-2"></div>
             <p class="text-sm text-slate-500">Memeriksa sesi...</p>
         </div>
@@ -41,16 +41,16 @@
             <p id="login-error" class="text-xs text-red-500 mt-4 hidden"></p>
         </div>
 
-        <!-- 3. TAMPILAN DASHBOARD ADMIN (Disembunyikan default) -->
-        <div id="view-admin" class=" w-full max-w-6xl bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden my-6">
+        <!-- 3. TAMPILAN DASHBOARD ADMIN (Diaktifkan langsung untuk Preview UI) -->
+        <div id="view-admin" class="w-full max-w-6xl bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden my-6">
             <!-- Header Dashboard -->
             <header class="bg-slate-900 text-white px-6 py-4 flex justify-between items-center">
                 <div>
-                    <span class="text-xs text-emerald-400 font-semibold uppercase tracking-wider">Admin Panel</span>
+                    <span class="text-xs text-emerald-400 font-semibold uppercase tracking-wider">Admin Panel (Preview Mode)</span>
                     <h2 class="text-xl font-bold">Arga Adventure 2.0</h2>
                 </div>
                 <div class="flex items-center gap-4">
-                    <span id="user-email-display" class="text-sm text-slate-300 hidden md:inline"></span>
+                    <span id="user-email-display" class="text-sm text-slate-300 hidden md:inline">preview@argaadventure.id</span>
                     <button onclick="logout()" class="bg-slate-800 hover:bg-slate-700 text-sm px-3 py-1.5 rounded-lg transition border border-slate-700">Keluar</button>
                 </div>
             </header>
@@ -132,43 +132,13 @@
             if (viewName === 'unauthorized') viewUnauthorized.classList.remove('hidden');
         }
 
-        // Pantau status auth Firebase
-        auth.onAuthStateChanged(async (user) => {
-            if (user) {
-                switchView('loading');
-                try {
-                    // Ambil ID Token Firebase
-                    const idToken = await user.getIdToken();
+        /* 
+          -- PANTAU STATUS AUTH DI-BYPASS SEMENTARA UNTUK PREVIEW UI --
+          auth.onAuthStateChanged(async (user) => { ... });
+        */
 
-                    // Kirim ke Google Apps Script untuk divalidasi dengan Google Sheet
-                    const response = await fetch(APPS_SCRIPT_URL, {
-                        method: 'POST',
-                        body: JSON.stringify({ token: idToken })
-                    });
-                    
-                    const result = await response.json();
-
-                    if (result.status === 'success' && result.active === true) {
-                        if (result.role === 'admin') {
-                            userEmailDisplay.textContent = user.email;
-                            switchView('admin');
-                        } else {
-                            // Skenario role lain (misal: guide/staff) bisa diarahkan ke view lain di sini
-                            switchView('unauthorized'); 
-                        }
-                    } else {
-                        switchView('unauthorized');
-                    }
-                } catch (error) {
-                    console.error("Gagal verifikasi backend:", error);
-                    loginError.textContent = "Terjadi kesalahan koneksi ke server verifikasi.";
-                    loginError.classList.remove('hidden');
-                    switchView('login');
-                }
-            } else {
-                switchView('login');
-            }
-        });
+        // PAKSA TAMPILKAN DASHBOARD ADMIN UNTUK KEPERLUAN UI PREVIEW
+        switchView('admin');
 
         // Fungsi Tombol Login Google
         function loginWithGoogle() {
@@ -183,6 +153,8 @@
         // Fungsi Logout
         function logout() {
             auth.signOut();
+            // Jika nanti sudah live, arahkan kembali ke view login
+            switchView('login');
         }
     </script>
 </body>
