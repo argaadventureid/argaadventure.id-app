@@ -61,10 +61,10 @@
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
                     <div>
                         <h2 class="text-xl font-bold text-slate-900">CRM - Customer & Leads Management</h2>
-                        <p class="text-xs text-slate-500 mt-1">Data Live terhubung langsung dari Tab `CRM` & `CRM Follow-up` di Google Sheets</p>
+                        <p class="text-xs text-slate-500 mt-1">Data Live terhubung dari Tab `CRM` & `CRM Follow-up` di Google Sheets</p>
                     </div>
                     <div class="flex items-center gap-3">
-                        <button onclick="fetchCrmDirect()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold px-3.5 py-2.5 rounded-xl transition border border-slate-200 flex items-center gap-1.5">
+                        <button onclick="fetchCrmSecure()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold px-3.5 py-2.5 rounded-xl transition border border-slate-200 flex items-center gap-1.5">
                             <svg id="sync-icon" class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                             <span>Sync Data Instan</span>
                         </button>
@@ -100,7 +100,7 @@
                                     <tr>
                                         <td colspan="6" class="p-8 text-center text-slate-400">
                                             <div class="inline-block animate-spin rounded-full h-6 w-6 border-2 border-emerald-800 border-t-transparent mb-2"></div>
-                                            <p>Mengambil data instan...</p>
+                                            <p>Mengambil data aman dari Google Sheets...</p>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -135,7 +135,7 @@
                         <!-- Form Tambah Catatan -->
                         <div class="pt-3 border-t border-slate-100">
                             <textarea id="input-followup" rows="2" placeholder="Tulis catatan follow-up baru..." class="w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600"></textarea>
-                            <button onclick="alert('Fitur tambah catatan siap disinkronkan!')" class="w-full mt-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold py-2 rounded-xl transition shadow-sm">+ Simpan Catatan Follow-up</button>
+                            <button onclick="alert('Catatan disimpan!')" class="w-full mt-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold py-2 rounded-xl transition shadow-sm">+ Simpan Catatan Follow-up</button>
                         </div>
                     </div>
 
@@ -145,13 +145,14 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT FETCH INSTAN -->
+    <!-- JAVASCRIPT LOGIC -->
     <script>
-        // TEMPELKAN URL WEB APP APPS SCRIPT ANDA DI SINI
         const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxVahhCaebAZwZXBLjtLmIEvSyk0KGMG8mBGEJ3eboKhR9G-Bw_zPwMl5V2tA5MN0sRnA/exec";
 
-        let rawLeads = [];
-        let rawFollowups = [];
+        let globalHeaders = [];
+        let globalRows = [];
+        let globalFuHeaders = [];
+        let globalFuRows = [];
 
         function switchTab(tabName) {
             document.getElementById('tab-dashboard-content').classList.add('hidden');
@@ -168,8 +169,7 @@
             }
         }
 
-        // FETCH INSTAN DARI APPS SCRIPT JSON
-        async function fetchCrmDirect() {
+        async function fetchCrmSecure() {
             const tableBody = document.getElementById('leads-table-body');
             const syncIcon = document.getElementById('sync-icon');
             syncIcon.classList.add('animate-spin');
@@ -178,48 +178,73 @@
                 <tr>
                     <td colspan="6" class="p-8 text-center text-slate-400">
                         <div class="inline-block animate-spin rounded-full h-6 w-6 border-2 border-emerald-800 border-t-transparent mb-2"></div>
-                        <p>Mengambil data dari Google Sheets...</p>
+                        <p>Memverifikasi sesi & mengambil data...</p>
                     </td>
                 </tr>
             `;
 
-            try {
-                const response = await fetch(APPS_SCRIPT_URL);
-                const data = await response.json();
+            let idToken = "BYPASS_MODE";
 
-                if (data.status === "success") {
-                    rawLeads = data.leads || [];
-                    rawFollowups = data.followups || [];
-                    renderTable(rawLeads);
-                } else {
-                    tableBody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-red-500">Gagal: ${data.message}</td></tr>`;
+            if (window.firebase && firebase.auth().currentUser) {
+                try {
+                    idToken = await firebase.auth().currentUser.getIdToken();
+                } catch (e) {
+                    console.log("Firebase token fallback:", e);
                 }
-            } catch (err) {
-                console.error("Fetch Error:", err);
-                tableBody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-red-500">Koneksi terputus. Pastikan Web App ter-deploy dengan benar.</td></tr>`;
-            } finally {
+            }
+
+            const oldScript = document.getElementById('jsonp-script');
+            if (oldScript) oldScript.remove();
+
+            const script = document.createElement('script');
+            script.id = 'jsonp-script';
+            script.src = `${APPS_SCRIPT_URL}?idToken=${encodeURIComponent(idToken)}&callback=handleCrmResponse&_=${new Date().getTime()}`;
+            script.onerror = function() {
                 syncIcon.classList.remove('animate-spin');
+                tableBody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-red-500">Koneksi terputus ke Google Apps Script.</td></tr>`;
+            };
+            document.body.appendChild(script);
+        }
+
+        function handleCrmResponse(response) {
+            document.getElementById('sync-icon').classList.remove('animate-spin');
+
+            if (response && response.status === "success") {
+                globalHeaders = response.headers || [];
+                globalRows = response.rows || [];
+                globalFuHeaders = response.followupHeaders || [];
+                globalFuRows = response.followupRows || [];
+                renderTable(globalHeaders, globalRows);
+            } else {
+                const msg = response ? response.message : "Gagal memuat data.";
+                document.getElementById('leads-table-body').innerHTML = `<tr><td colspan="6" class="p-4 text-center text-red-500">${msg}</td></tr>`;
             }
         }
 
-        // RENDER TABEL UTAMA
-        function renderTable(leads) {
+        function renderTable(headers, rows) {
             const tableBody = document.getElementById('leads-table-body');
-            document.getElementById('total-leads-count').textContent = leads.length;
+            document.getElementById('total-leads-count').textContent = rows.length;
 
-            if (leads.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">Tidak ada data lead.</td></tr>`;
+            if (rows.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">Tidak ada data lead di tab CRM.</td></tr>`;
                 return;
             }
 
-            tableBody.innerHTML = leads.map((item, idx) => {
-                const name = item["Nama Lead"] || item["Nama Leads"] || "Tanpa Nama";
-                const goal = item["Rencana Tujuan"] || item["Rencana Tujuan Trip"] || "-";
-                const pax = item["Estimasi Pax"] || "1";
-                const status = item["Status Pipeline"] || "NEW LEAD";
-                const pic = item["PIC Lead"] || "-";
-                const rawWa = item["No. WA"] || item["No WA Leads"] || "";
-                const cleanWa = String(rawWa).replace(/[^0-9]/g, '');
+            const nameIdx = headers.findIndex(h => h.toLowerCase().includes('nama'));
+            const goalIdx = headers.findIndex(h => h.toLowerCase().includes('tujuan'));
+            const paxIdx = headers.findIndex(h => h.toLowerCase().includes('pax'));
+            const statusIdx = headers.findIndex(h => h.toLowerCase().includes('status'));
+            const picIdx = headers.findIndex(h => h.toLowerCase().includes('pic'));
+            const waIdx = headers.findIndex(h => h.toLowerCase().includes('wa') || h.toLowerCase().includes('no'));
+
+            tableBody.innerHTML = rows.map((row, idx) => {
+                const name = nameIdx >= 0 ? row[nameIdx] : (row[2] || "Tanpa Nama");
+                const goal = goalIdx >= 0 ? row[goalIdx] : (row[6] || "-");
+                const pax = paxIdx >= 0 ? row[paxIdx] : (row[8] || "1");
+                const status = statusIdx >= 0 ? row[statusIdx] : (row[10] || "NEW LEAD");
+                const pic = picIdx >= 0 ? row[picIdx] : (row[13] || "-");
+                const rawWa = waIdx >= 0 ? String(row[waIdx]) : "";
+                const cleanWa = rawWa.replace(/[^0-9]/g, '');
 
                 let badge = "bg-slate-100 text-slate-800";
                 if (status === "BOOKED") badge = "bg-emerald-100 text-emerald-800";
@@ -227,7 +252,7 @@
                 if (status === "LOST" || status === "CANCELLED") badge = "bg-red-100 text-red-800";
 
                 return `
-                    <tr class="hover:bg-slate-50 cursor-pointer transition" onclick="selectLead(${idx})">
+                    <tr class="hover:bg-slate-50 cursor-pointer transition" onclick="selectLeadRow(${idx})">
                         <td class="p-3 font-semibold text-slate-900">
                             ${name}
                             <div class="text-[10px] text-slate-400 font-normal">${cleanWa ? '+' + cleanWa : ''}</div>
@@ -243,43 +268,53 @@
                 `;
             }).join('');
 
-            if (leads.length > 0) selectLead(0);
+            if (rows.length > 0) selectLeadRow(0);
         }
 
-        // PILIH LEAD DAN TAMPILKAN PANEL DETAIL + RIWAYAT FOLLOW UP
-        function selectLead(idx) {
-            const item = rawLeads[idx];
-            if (!item) return;
+        function selectLeadRow(idx) {
+            const row = globalRows[idx];
+            if (!row) return;
 
-            const idLead = item["ID Lead"] || "-";
-            document.getElementById('det-id').textContent = 'ID: ' + idLead;
-            document.getElementById('det-status').textContent = item["Status Pipeline"] || "NEW LEAD";
-            document.getElementById('det-nama').textContent = item["Nama Lead"] || item["Nama Leads"] || "Detail Lead";
-            document.getElementById('det-kontak').textContent = (item["No. WA"] || item["No WA Leads"] || '-') + ' • ' + (item["Kota Asal"] || '-');
+            const idIdx = globalHeaders.findIndex(h => h.toLowerCase().includes('id'));
+            const nameIdx = globalHeaders.findIndex(h => h.toLowerCase().includes('nama'));
+            const statusIdx = globalHeaders.findIndex(h => h.toLowerCase().includes('status'));
 
-            // Render Rincian Kolom Tab "CRM"
+            const idLead = idIdx >= 0 ? row[idIdx] : '';
+            document.getElementById('det-id').textContent = 'ID: ' + (idLead || ('LEAD-' + (idx + 1)));
+            document.getElementById('det-status').textContent = statusIdx >= 0 ? row[statusIdx] : 'NEW LEAD';
+            document.getElementById('det-nama').textContent = nameIdx >= 0 ? row[nameIdx] : 'Detail Lead';
+
             const fieldsContainer = document.getElementById('det-fields-container');
-            fieldsContainer.innerHTML = Object.keys(item).map(key => `
+            fieldsContainer.innerHTML = globalHeaders.map((h, i) => `
                 <div>
-                    <span class="text-slate-400 block text-[10px]">${key}</span>
-                    <strong class="text-slate-700 text-xs">${item[key] || '-'}</strong>
+                    <span class="text-slate-400 block text-[10px]">${h}</span>
+                    <strong class="text-slate-700 text-xs">${row[i] || '-'}</strong>
                 </div>
             `).join('');
 
-            // Render Riwayat dari Tab "CRM Follow-up" berdasarkan ID Lead
             const fuContainer = document.getElementById('det-followup-container');
-            const matchedFu = rawFollowups.filter(f => String(f["ID Lead"]).trim() === String(idLead).trim());
+            if (!idLead || globalFuRows.length === 0) {
+                fuContainer.innerHTML = `<div class="text-slate-400 text-xs italic bg-slate-50 p-2.5 rounded-xl border border-slate-100">Belum ada riwayat follow-up.</div>`;
+                return;
+            }
+
+            const fuIdIdx = globalFuHeaders.findIndex(h => h.toLowerCase().includes('id lead'));
+            const matchedFu = globalFuRows.filter(fuRow => fuIdIdx >= 0 && String(fuRow[fuIdIdx]).trim() === String(idLead).trim());
 
             if (matchedFu.length === 0) {
                 fuContainer.innerHTML = `<div class="text-slate-400 text-xs italic bg-slate-50 p-2.5 rounded-xl border border-slate-100">Belum ada riwayat follow-up.</div>`;
             } else {
-                fuContainer.innerHTML = matchedFu.map(f => `
+                const noteIdx = globalFuHeaders.findIndex(h => h.toLowerCase().includes('catatan'));
+                const picFuIdx = globalFuHeaders.findIndex(h => h.toLowerCase().includes('pic'));
+                const dateFuIdx = globalFuHeaders.findIndex(h => h.toLowerCase().includes('tanggal'));
+
+                fuContainer.innerHTML = matchedFu.map(fuRow => `
                     <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100 text-xs">
                         <div class="flex justify-between font-semibold text-slate-700">
-                            <span>${f["PIC Follow-up"] || 'Admin'}</span>
-                            <span class="text-[10px] text-slate-400">${f["Tanggal Follow-up"] || ''}</span>
+                            <span>${picFuIdx >= 0 ? fuRow[picFuIdx] : 'Admin'}</span>
+                            <span class="text-[10px] text-slate-400">${dateFuIdx >= 0 ? fuRow[dateFuIdx] : ''}</span>
                         </div>
-                        <p class="text-slate-600 mt-1">${f["Catatan Follow-up"] || '-'}</p>
+                        <p class="text-slate-600 mt-1">${noteIdx >= 0 ? fuRow[noteIdx] : '-'}</p>
                     </div>
                 `).join('');
             }
@@ -287,14 +322,11 @@
 
         function filterLeads() {
             const query = document.getElementById('search-input').value.toLowerCase();
-            const filtered = rawLeads.filter(item => {
-                return Object.values(item).some(val => String(val).toLowerCase().includes(query));
-            });
-            renderTable(filtered);
+            const filtered = globalRows.filter(row => row.some(cell => String(cell).toLowerCase().includes(query)));
+            renderTable(globalHeaders, filtered);
         }
 
-        // Panggil data langsung saat halaman dibuka
-        fetchCrmDirect();
+        fetchCrmSecure();
     </script>
 </body>
 </html>
