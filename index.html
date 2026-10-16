@@ -152,7 +152,7 @@
             /^https:\/\/(?:[a-z0-9-]+-)?script\.googleusercontent\.com$/i.test(event.origin) ||
             event.origin === "https://script.google.com";
 
-          if (event.source !== accessFrame.contentWindow || !trustedOrigin) return;
+          if (!trustedOrigin) return;
 
           const message = event.data;
           if (!message || message.channel !== "arga-access" || message.nonce !== nonce) return;
