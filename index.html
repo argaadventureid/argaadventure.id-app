@@ -52,8 +52,8 @@
 
                     <!-- Menu Navigasi Utama -->
                     <nav class="hidden md:flex items-center gap-2 bg-[#0e261e] p-1.5 rounded-xl border border-emerald-900/50">
-                        <button id="nav-dashboard" onclick="switchTab('dashboard')" class="bg-amber-600 text-white text-xs font-semibold px-3.5 py-1.5 rounded-lg transition shadow-sm">Dashboard</button>
-                        <button id="nav-crm" onclick="switchTab('crm')" class="hover:bg-white/10 text-slate-200 hover:text-white text-xs font-medium px-3.5 py-1.5 rounded-lg transition">CRM</button>
+                        <button id="nav-dashboard" onclick="switchTab('dashboard')" class="hover:bg-white/10 text-slate-200 hover:text-white text-xs font-medium px-3.5 py-1.5 rounded-lg transition">Dashboard</button>
+                        <button id="nav-crm" onclick="switchTab('crm')" class="bg-amber-600 text-white text-xs font-semibold px-3.5 py-1.5 rounded-lg transition shadow-sm">CRM</button>
                         <button id="nav-trip" onclick="switchTab('trip')" class="hover:bg-white/10 text-slate-200 hover:text-white text-xs font-medium px-3.5 py-1.5 rounded-lg transition">Trip Event</button>
                         <button id="nav-finance" onclick="switchTab('finance')" class="hover:bg-white/10 text-slate-200 hover:text-white text-xs font-medium px-3.5 py-1.5 rounded-lg transition">Finance</button>
                     </nav>
@@ -66,56 +66,33 @@
             </header>
 
             <!-- KONTEN TAB: DASHBOARD -->
-            <main id="tab-dashboard-content" class="flex-1 p-6 md:p-8 space-y-6 max-w-7xl mx-auto w-full">
+            <main id="tab-dashboard-content" class="hidden flex-1 p-6 md:p-8 space-y-6 max-w-7xl mx-auto w-full">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.08)] transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_20px_35px_-10px_rgba(0,0,0,0.12)] cursor-pointer">
+                    <div class="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm">
                         <h3 class="text-emerald-900 font-semibold text-sm">Status Sistem</h3>
                         <p class="text-3xl font-bold text-emerald-800 mt-2">Aktif & Terhubung</p>
-                        <p class="text-xs text-slate-500 mt-2">Sinkronisasi Google Sheet Lancar</p>
                     </div>
-                    <div class="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.08)] transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_20px_35px_-10px_rgba(0,0,0,0.12)] cursor-pointer">
-                        <h3 class="text-blue-900 font-semibold text-sm">Hak Akses</h3>
-                        <p class="text-3xl font-bold text-blue-800 mt-2">Administrator</p>
-                        <p class="text-xs text-slate-500 mt-2">Akses penuh modul operasional</p>
-                    </div>
-                    <div class="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.08)] transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_20px_35px_-10px_rgba(0,0,0,0.12)]">
-                        <h3 class="text-amber-900 font-semibold text-sm">Aksi Cepat</h3>
-                        <div class="mt-4 flex gap-2">
-                            <button onclick="switchTab('crm')" class="bg-amber-600 hover:bg-amber-700 text-white text-xs px-3.5 py-2 rounded-xl font-medium transition shadow-sm">+ Kelola Leads CRM</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="border border-slate-200/80 rounded-2xl p-6 bg-white shadow-[0_10px_25px_-5px_rgba(0,0,0,0.08)] min-h-[400px]">
-                    <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-100">
-                        <h3 class="font-bold text-slate-800 text-lg flex items-center gap-2">
-                            <span class="w-2.5 h-2.5 rounded-full bg-amber-600"></span>
-                            Ringkasan Aktivitas
-                        </h3>
-                        <span class="text-xs text-emerald-800 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-lg font-medium">Live Data from Google Sheet</span>
-                    </div>
-                    <p class="text-sm text-slate-500">Pilih menu **CRM** di header atas untuk mengelola data leads dan riwayat follow-up secara terstruktur.</p>
                 </div>
             </main>
 
             <!-- KONTEN TAB: CRM (MODUL CRM LENGKAP) -->
-            <main id="tab-crm-content" class="hidden flex-1 p-6 md:p-8 space-y-6 max-w-7xl mx-auto w-full">
+            <main id="tab-crm-content" class="flex-1 p-6 md:p-8 space-y-6 max-w-7xl mx-auto w-full">
                 <!-- Header CRM & Filter -->
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.08)]">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
                     <div>
                         <h2 class="text-xl font-bold text-slate-900">CRM - Customer & Leads Management</h2>
                         <p class="text-xs text-slate-500 mt-1">Mengelola pipeline calon pendaki & riwayat kontak terintegrasi Tab `CRM` dan `CRM Follow-up`</p>
                     </div>
-                    <button class="bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition shadow-sm flex items-center gap-2">
-                        <span>+ Tambah Lead Baru</span>
+                    <button class="bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition shadow-sm">
+                        + Tambah Lead Baru
                     </button>
                 </div>
 
-                <!-- Area Kerja CRM (Tabel Leads & Panel Detail Follow-up) -->
+                <!-- Area Kerja CRM (Tabel Leads & Panel Detail Lengkap) -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     
-                    <!-- Tabel Data Leads (Mengambil 2 Kolom Layar) -->
-                    <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200/80 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.08)] p-6">
+                    <!-- Tabel Data Leads (2 Kolom) -->
+                    <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="font-bold text-slate-800">Daftar Leads Aktif</h3>
                             <input type="text" placeholder="Cari Nama / No WA / Tujuan..." class="text-xs bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-emerald-600">
@@ -134,7 +111,7 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-100">
-                                    <tr class="hover:bg-slate-50 cursor-pointer transition" onclick="selectLead('LEAD-001', 'Budi Santoso', 'Prau (Dieng)', '4 Pax', 'Warm Lead', 'Dimas')">
+                                    <tr class="hover:bg-slate-50 cursor-pointer transition" onclick="selectLead('LEAD-001', 'Budi Santoso', '+628123456789', 'Jakarta', '10 Oct 2026', 'Instagram Ads', 'Prau (Dieng)', 'Private Trip', '4 Pax', 'Rp 3.500.000', 'Warm Lead', '-', '25 Oct 2026', 'Dimas')">
                                         <td class="p-3 font-semibold text-slate-900">
                                             Budi Santoso
                                             <div class="text-[10px] text-slate-400 font-normal">+628123456789 (Jakarta)</div>
@@ -147,7 +124,7 @@
                                             <a href="https://wa.me/628123456789" target="_blank" onclick="event.stopPropagation()" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-2.5 py-1 rounded-lg text-[10px] font-semibold inline-flex items-center gap-1">WA</a>
                                         </td>
                                     </tr>
-                                    <tr class="hover:bg-slate-50 cursor-pointer transition" onclick="selectLead('LEAD-002', 'Siti Rahma', 'Annapurna BC', '2 Pax', 'Hot Lead', 'Arga')">
+                                    <tr class="hover:bg-slate-50 cursor-pointer transition" onclick="selectLead('LEAD-002', 'Siti Rahma', '+628987654321', 'Bandung', '12 Oct 2026', 'Organic Web', 'Annapurna BC', 'Open Trip', '2 Pax', 'Rp 18.000.000', 'Hot Lead', '-', '05 Nov 2026', 'Arga')">
                                         <td class="p-3 font-semibold text-slate-900">
                                             Siti Rahma
                                             <div class="text-[10px] text-slate-400 font-normal">+628987654321 (Bandung)</div>
@@ -165,19 +142,36 @@
                         </div>
                     </div>
 
-                    <!-- Panel Riwayat Follow-up (Terhubung via ID Lead) -->
-                    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.08)] p-6 flex flex-col justify-between">
+                    <!-- Panel Detail Spreadsheet & Follow-up (1 Kolom) -->
+                    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 flex flex-col justify-between space-y-4">
                         <div>
-                            <div class="pb-3 border-b border-slate-100 mb-4">
-                                <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md font-mono" id="selected-lead-id">ID Lead: LEAD-001</span>
-                                <h3 class="font-bold text-slate-900 text-base mt-1" id="selected-lead-name">Budi Santoso</h3>
-                                <p class="text-xs text-slate-500" id="selected-lead-info">Tujuan: Prau (Dieng) • 4 Pax</p>
+                            <!-- Header Info Detail Lead -->
+                            <div class="pb-3 border-b border-slate-100 mb-3">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md font-mono" id="det-id">LEAD-001</span>
+                                    <span class="text-[10px] bg-emerald-100 text-emerald-800 font-semibold px-2 py-0.5 rounded-full" id="det-status">Warm Lead</span>
+                                </div>
+                                <h3 class="font-bold text-slate-900 text-base mt-1" id="det-nama">Budi Santoso</h3>
+                                <p class="text-xs text-slate-500" id="det-kontak">+628123456789 • Jakarta</p>
+                            </div>
+
+                            <!-- Detail Kolom Spreadsheet -->
+                            <div class="grid grid-cols-2 gap-2 text-xs bg-slate-50 p-3 rounded-xl border border-slate-100 mb-4">
+                                <div><span class="text-slate-400 block text-[10px]">Tanggal Lead</span><strong id="det-tgl" class="text-slate-700">10 Oct 2026</strong></div>
+                                <div><span class="text-slate-400 block text-[10px]">Sumber</span><strong id="det-sumber" class="text-slate-700">Instagram Ads</strong></div>
+                                <div><span class="text-slate-400 block text-[10px]">Rencana Tujuan</span><strong id="det-tujuan" class="text-slate-700">Prau (Dieng)</strong></div>
+                                <div><span class="text-slate-400 block text-[10px]">Jenis Trip</span><strong id="det-trip" class="text-slate-700">Private Trip</strong></div>
+                                <div><span class="text-slate-400 block text-[10px]">Estimasi Pax</span><strong id="det-pax" class="text-slate-700">4 Pax</strong></div>
+                                <div><span class="text-slate-400 block text-[10px]">Estimasi Nilai</span><strong id="det-nilai" class="text-emerald-700">Rp 3.500.000</strong></div>
+                                <div><span class="text-slate-400 block text-[10px]">Rencana Tgl Trip</span><strong id="det-tgltrip" class="text-slate-700">25 Oct 2026</strong></div>
+                                <div><span class="text-slate-400 block text-[10px]">PIC Lead</span><strong id="det-pic" class="text-slate-700">Dimas</strong></div>
+                                <div class="col-span-2 pt-1 border-t border-slate-200"><span class="text-slate-400 block text-[10px]">Alasan Lost (Jika Gagal)</span><strong id="det-lost" class="text-slate-600">-</strong></div>
                             </div>
 
                             <!-- Timeline Follow-up -->
-                            <h4 class="text-xs font-semibold text-slate-700 uppercase tracking-wider mb-3">Riwayat Follow-up</h4>
-                            <div class="space-y-3 max-h-[250px] overflow-y-auto pr-1" id="followup-timeline">
-                                <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-xs">
+                            <h4 class="text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">Riwayat Follow-up</h4>
+                            <div class="space-y-2 max-h-[140px] overflow-y-auto pr-1" id="followup-timeline">
+                                <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100 text-xs">
                                     <div class="flex justify-between font-semibold text-slate-700">
                                         <span>Dimas</span>
                                         <span class="text-[10px] text-slate-400">16 Oct 2026</span>
@@ -187,8 +181,8 @@
                             </div>
                         </div>
 
-                        <!-- Form Tambah Catatan Follow-up -->
-                        <div class="mt-6 pt-4 border-t border-slate-100">
+                        <!-- Form Catatan Follow-up Baru -->
+                        <div class="pt-3 border-t border-slate-100">
                             <textarea id="input-followup" rows="2" placeholder="Tulis catatan follow-up baru..." class="w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600"></textarea>
                             <button onclick="addFollowup()" class="w-full mt-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold py-2 rounded-xl transition shadow-sm">+ Simpan Catatan Follow-up</button>
                         </div>
@@ -200,45 +194,42 @@
         </div>
     </div>
 
-    <!-- SCRIPT KONFIGURASI & LOGIKA NAVIGASI TAB -->
+    <!-- SCRIPT LOGIKA -->
     <script>
-        const firebaseConfig = {
-            apiKey: "GANTI_DENGAN_API_KEY_FIREBASE",
-            authDomain: "GANTI_DENGAN_AUTH_DOMAIN",
-            projectId: "GANTI_DENGAN_PROJECT_ID"
-        };
+        const firebaseConfig = { apiKey: "X", authDomain: "X", projectId: "X" };
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
 
-        const viewAdmin = document.getElementById('view-admin');
-        const tabDashboard = document.getElementById('tab-dashboard-content');
-        const tabCrm = document.getElementById('tab-crm-content');
-
-        const navDashboard = document.getElementById('nav-dashboard');
-        const navCrm = document.getElementById('nav-crm');
-
-        // FUNGSI PINDAH TAB (DASHBOARD <-> CRM)
         function switchTab(tabName) {
-            tabDashboard.classList.add('hidden');
-            tabCrm.classList.add('hidden');
-
-            navDashboard.className = "hover:bg-white/10 text-slate-200 hover:text-white text-xs font-medium px-3.5 py-1.5 rounded-lg transition";
-            navCrm.className = "hover:bg-white/10 text-slate-200 hover:text-white text-xs font-medium px-3.5 py-1.5 rounded-lg transition";
+            document.getElementById('tab-dashboard-content').classList.add('hidden');
+            document.getElementById('tab-crm-content').classList.add('hidden');
+            document.getElementById('nav-dashboard').className = "hover:bg-white/10 text-slate-200 hover:text-white text-xs font-medium px-3.5 py-1.5 rounded-lg transition";
+            document.getElementById('nav-crm').className = "hover:bg-white/10 text-slate-200 hover:text-white text-xs font-medium px-3.5 py-1.5 rounded-lg transition";
 
             if (tabName === 'dashboard') {
-                tabDashboard.classList.remove('hidden');
-                navDashboard.className = "bg-amber-600 text-white text-xs font-semibold px-3.5 py-1.5 rounded-lg transition shadow-sm";
+                document.getElementById('tab-dashboard-content').classList.remove('hidden');
+                document.getElementById('nav-dashboard').className = "bg-amber-600 text-white text-xs font-semibold px-3.5 py-1.5 rounded-lg transition shadow-sm";
             } else if (tabName === 'crm') {
-                tabCrm.classList.remove('hidden');
-                navCrm.className = "bg-amber-600 text-white text-xs font-semibold px-3.5 py-1.5 rounded-lg transition shadow-sm";
+                document.getElementById('tab-crm-content').classList.remove('hidden');
+                document.getElementById('nav-crm').className = "bg-amber-600 text-white text-xs font-semibold px-3.5 py-1.5 rounded-lg transition shadow-sm";
             }
         }
 
-        // FUNGSI PILIH LEAD DI TABEL (TAMPILKAN DETAIL & FOLLOW-UP)
-        function selectLead(id, name, destination, pax, status, pic) {
-            document.getElementById('selected-lead-id').textContent = 'ID Lead: ' + id;
-            document.getElementById('selected-lead-name').textContent = name;
-            document.getElementById('selected-lead-info').textContent = 'Tujuan: ' + destination + ' • ' + pax;
+        // FUNGSI MENAMPILKAN DETAIL LENGKAP SESUAI KOLOM SPREADSHEET
+        function selectLead(id, nama, wa, kota, tglLead, sumber, tujuan, jenisTrip, pax, nilai, status, lost, tglTrip, pic) {
+            document.getElementById('det-id').textContent = id;
+            document.getElementById('det-nama').textContent = nama;
+            document.getElementById('det-kontak').textContent = wa + ' • ' + kota;
+            document.getElementById('det-status').textContent = status;
+            document.getElementById('det-tgl').textContent = tglLead;
+            document.getElementById('det-sumber').textContent = sumber;
+            document.getElementById('det-tujuan').textContent = tujuan;
+            document.getElementById('det-trip').textContent = jenisTrip;
+            document.getElementById('det-pax').textContent = pax;
+            document.getElementById('det-nilai').textContent = nilai;
+            document.getElementById('det-tgltrip').textContent = tglTrip;
+            document.getElementById('det-pic').textContent = pic;
+            document.getElementById('det-lost').textContent = lost;
         }
 
         function addFollowup() {
@@ -247,21 +238,17 @@
             
             const timeline = document.getElementById('followup-timeline');
             const newCard = document.createElement('div');
-            newCard.className = "bg-slate-50 p-3 rounded-xl border border-slate-100 text-xs";
+            newCard.className = "bg-slate-50 p-2.5 rounded-xl border border-slate-100 text-xs";
             newCard.innerHTML = `
                 <div class="flex justify-between font-semibold text-slate-700">
                     <span>Admin</span>
-                    <span class="text-[10px] text-slate-400">Hari Ini</span>
+                    <span class="text-[10px] text-slate-400">Baru Saja</span>
                 </div>
                 <p class="text-slate-600 mt-1">${input.value}</p>
             `;
             timeline.prepend(newCard);
             input.value = '';
         }
-
-        // DEFAULT PREVIEW
-        document.getElementById('view-loading').classList.add('hidden');
-        viewAdmin.classList.remove('hidden');
     </script>
 </body>
 </html>
