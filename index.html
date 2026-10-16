@@ -57,16 +57,16 @@
 
             <!-- TAB: CRM -->
             <main id="tab-crm-content" class="flex-1 p-6 md:p-8 space-y-6 max-w-7xl mx-auto w-full">
-                <!-- Header CRM & Refresh -->
+                <!-- Header CRM & Sync -->
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
                     <div>
                         <h2 class="text-xl font-bold text-slate-900">CRM - Customer & Leads Management</h2>
-                        <p class="text-xs text-slate-500 mt-1">Data Live terhubung melalui Secure Bridge ke Google Sheets `DB ARGA ADVENTURE`</p>
+                        <p class="text-xs text-slate-500 mt-1">Data Live terhubung langsung dari Tab `CRM` & `CRM Follow-up` di Google Sheets</p>
                     </div>
                     <div class="flex items-center gap-3">
-                        <button onclick="loadCrmDataViaBridge()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold px-3 py-2.5 rounded-xl transition border border-slate-200 flex items-center gap-1.5">
+                        <button onclick="fetchCrmDirect()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold px-3.5 py-2.5 rounded-xl transition border border-slate-200 flex items-center gap-1.5">
                             <svg id="sync-icon" class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                            <span>Sync Data</span>
+                            <span>Sync Data Instan</span>
                         </button>
                         <button class="bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition shadow-sm">
                             + Tambah Lead Baru
@@ -81,25 +81,26 @@
                     <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="font-bold text-slate-800">Daftar Leads Aktif (<span id="total-leads-count">0</span>)</h3>
-                            <input type="text" id="search-input" onkeyup="filterLeads()" placeholder="Cari Nama / WA / Tujuan..." class="text-xs bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-emerald-600">
+                            <input type="text" id="search-input" onkeyup="filterLeads()" placeholder="Cari Nama / No WA / Tujuan..." class="text-xs bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-emerald-600">
                         </div>
 
                         <div class="overflow-x-auto min-h-[350px]">
                             <table class="w-full text-left text-xs border-collapse">
                                 <thead>
-                                    <tr class="bg-slate-50 text-slate-600 uppercase font-semibold border-b border-slate-200" id="table-header-row">
+                                    <tr class="bg-slate-50 text-slate-600 uppercase font-semibold border-b border-slate-200">
                                         <th class="p-3">Nama Lead</th>
-                                        <th class="p-3">Tujuan</th>
+                                        <th class="p-3">Rencana Tujuan</th>
                                         <th class="p-3">Pax</th>
                                         <th class="p-3">Status Pipeline</th>
+                                        <th class="p-3">PIC</th>
                                         <th class="p-3 text-center">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody id="leads-table-body" class="divide-y divide-slate-100">
                                     <tr>
-                                        <td colspan="5" class="p-8 text-center text-slate-400">
+                                        <td colspan="6" class="p-8 text-center text-slate-400">
                                             <div class="inline-block animate-spin rounded-full h-6 w-6 border-2 border-emerald-800 border-t-transparent mb-2"></div>
-                                            <p>Memuat data via Secure Bridge...</p>
+                                            <p>Mengambil data instan...</p>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -116,19 +117,25 @@
                                     <span class="text-[10px] bg-emerald-100 text-emerald-800 font-semibold px-2 py-0.5 rounded-full" id="det-status">-</span>
                                 </div>
                                 <h3 class="font-bold text-slate-900 text-base mt-1" id="det-nama">Pilih Lead</h3>
-                                <p class="text-xs text-slate-500" id="det-kontak">Klik baris tabel untuk melihat detail lengkap</p>
+                                <p class="text-xs text-slate-500" id="det-kontak">Klik baris tabel untuk melihat rincian lengkap</p>
                             </div>
 
-                            <!-- Dynamic Key-Value Spreadsheet Attributes -->
-                            <div class="grid grid-cols-2 gap-2 text-xs bg-slate-50 p-3 rounded-xl border border-slate-100 mb-4 max-h-[260px] overflow-y-auto" id="det-fields-container">
+                            <!-- Detail Kolom Tab "CRM" -->
+                            <div class="grid grid-cols-2 gap-2 text-xs bg-slate-50 p-3 rounded-xl border border-slate-100 mb-4 max-h-[220px] overflow-y-auto" id="det-fields-container">
                                 <div class="col-span-2 text-slate-400 text-center py-4">Belum ada lead yang dipilih</div>
+                            </div>
+
+                            <!-- Riwayat Follow-up (Tab "CRM Follow-up") -->
+                            <h4 class="text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">Riwayat Follow-up</h4>
+                            <div class="space-y-2 max-h-[140px] overflow-y-auto pr-1" id="det-followup-container">
+                                <div class="text-slate-400 text-xs italic">Belum ada catatan follow-up.</div>
                             </div>
                         </div>
 
-                        <!-- Form Catatan Follow-up -->
+                        <!-- Form Tambah Catatan -->
                         <div class="pt-3 border-t border-slate-100">
                             <textarea id="input-followup" rows="2" placeholder="Tulis catatan follow-up baru..." class="w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600"></textarea>
-                            <button onclick="alert('Catatan disimpan ke sistem!')" class="w-full mt-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold py-2 rounded-xl transition shadow-sm">+ Simpan Catatan Follow-up</button>
+                            <button onclick="alert('Fitur tambah catatan siap disinkronkan!')" class="w-full mt-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold py-2 rounded-xl transition shadow-sm">+ Simpan Catatan Follow-up</button>
                         </div>
                     </div>
 
@@ -138,17 +145,13 @@
         </div>
     </div>
 
-    <!-- HIDDEN IFRAME FOR APPS SCRIPT BRIDGE -->
-    <iframe id="gas-bridge-iframe" class="hidden"></iframe>
-
-    <!-- JAVASCRIPT LOGIC WITH POSTMESSAGE SECURITY BRIDGE -->
+    <!-- JAVASCRIPT FETCH INSTAN -->
     <script>
         // TEMPELKAN URL WEB APP APPS SCRIPT ANDA DI SINI
-        const GAS_WEB_APP_URL = "GANTI_DENGAN_URL_WEB_APP_APPS_SCRIPT_ANDA";
+        const APPS_SCRIPT_URL = "GANTI_DENGAN_URL_WEB_APP_APPS_SCRIPT_ANDA";
 
-        let globalHeaders = [];
-        let globalRows = [];
-        let currentNonce = null;
+        let rawLeads = [];
+        let rawFollowups = [];
 
         function switchTab(tabName) {
             document.getElementById('tab-dashboard-content').classList.add('hidden');
@@ -165,92 +168,74 @@
             }
         }
 
-        function generateNonce() {
-            return 'nonce_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-        }
-
-        // FUNGSI REQUEST KE GAS MEMANFAATKAN POSTMESSAGE BRIDGE
-        function loadCrmDataViaBridge() {
+        // FETCH INSTAN DARI APPS SCRIPT JSON
+        async function fetchCrmDirect() {
             const tableBody = document.getElementById('leads-table-body');
             const syncIcon = document.getElementById('sync-icon');
             syncIcon.classList.add('animate-spin');
 
             tableBody.innerHTML = `
                 <tr>
-                    <td colspan="5" class="p-8 text-center text-slate-400">
+                    <td colspan="6" class="p-8 text-center text-slate-400">
                         <div class="inline-block animate-spin rounded-full h-6 w-6 border-2 border-emerald-800 border-t-transparent mb-2"></div>
-                        <p>Menghubungkan ke Google Apps Script via Secure Bridge...</p>
+                        <p>Mengambil data dari Google Sheets...</p>
                     </td>
                 </tr>
             `;
 
-            currentNonce = generateNonce();
-            const payload = JSON.stringify({ action: "crmList", idToken: "BYPASS_MODE" });
-            const iframe = document.getElementById('gas-bridge-iframe');
+            try {
+                const response = await fetch(APPS_SCRIPT_URL);
+                const data = await response.json();
 
-            // Set src iframe dengan URL GAS + parameter payload & nonce
-            const targetUrl = `${GAS_WEB_APP_URL}?nonce=${encodeURIComponent(currentNonce)}&payload=${encodeURIComponent(payload)}`;
-            iframe.src = targetUrl;
+                if (data.status === "success") {
+                    rawLeads = data.leads || [];
+                    rawFollowups = data.followups || [];
+                    renderTable(rawLeads);
+                } else {
+                    tableBody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-red-500">Gagal: ${data.message}</td></tr>`;
+                }
+            } catch (err) {
+                console.error("Fetch Error:", err);
+                tableBody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-red-500">Koneksi terputus. Pastikan Web App ter-deploy dengan benar.</td></tr>`;
+            } finally {
+                syncIcon.classList.remove('animate-spin');
+            }
         }
 
-        // MENDENGARKAN BALASAN DARI POSTMESSAGE APPS SCRIPT
-        window.addEventListener("message", function(event) {
-            const data = event.data;
-            if (!data || data.channel !== "arga-access") return;
-            if (data.nonce !== currentNonce) return;
-
-            document.getElementById('sync-icon').classList.remove('animate-spin');
-            const result = data.result;
-
-            if (result && result.allowed) {
-                globalHeaders = result.headers || [];
-                globalRows = result.rows || [];
-                renderCrmTable(globalRows);
-            } else {
-                const msg = (result && result.message) ? result.message : "Akses ditolak atau gagal memuat data.";
-                document.getElementById('leads-table-body').innerHTML = `<tr><td colspan="5" class="p-4 text-center text-red-500">${msg}</td></tr>`;
-            }
-        });
-
-        // RENDER TABEL BERDASARKAN HASIL QUERY SPREADSHEET
-        function renderCrmTable(rows) {
+        // RENDER TABEL UTAMA
+        function renderTable(leads) {
             const tableBody = document.getElementById('leads-table-body');
-            document.getElementById('total-leads-count').textContent = rows.length;
+            document.getElementById('total-leads-count').textContent = leads.length;
 
-            if (rows.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">Tidak ada data CRM ditemukan.</td></tr>`;
+            if (leads.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">Tidak ada data lead.</td></tr>`;
                 return;
             }
 
-            // Temukan Indeks Kolom
-            const nameIdx = globalHeaders.findIndex(h => h.toLowerCase().includes('nama'));
-            const goalIdx = globalHeaders.findIndex(h => h.toLowerCase().includes('tujuan'));
-            const paxIdx = globalHeaders.findIndex(h => h.toLowerCase().includes('pax'));
-            const statusIdx = globalHeaders.findIndex(h => h.toLowerCase().includes('status'));
-            const waIdx = globalHeaders.findIndex(h => h.toLowerCase().includes('wa') || h.toLowerCase().includes('no'));
+            tableBody.innerHTML = leads.map((item, idx) => {
+                const name = item["Nama Lead"] || item["Nama Leads"] || "Tanpa Nama";
+                const goal = item["Rencana Tujuan"] || item["Rencana Tujuan Trip"] || "-";
+                const pax = item["Estimasi Pax"] || "1";
+                const status = item["Status Pipeline"] || "NEW LEAD";
+                const pic = item["PIC Lead"] || "-";
+                const rawWa = item["No. WA"] || item["No WA Leads"] || "";
+                const cleanWa = String(rawWa).replace(/[^0-9]/g, '');
 
-            tableBody.innerHTML = rows.map((row, index) => {
-                const name = nameIdx >= 0 ? row[nameIdx] : (row[1] || 'Tanpa Nama');
-                const goal = goalIdx >= 0 ? row[goalIdx] : (row[6] || '-');
-                const pax = paxIdx >= 0 ? row[paxIdx] : (row[8] || '1');
-                const status = statusIdx >= 0 ? row[statusIdx] : (row[10] || 'NEW LEAD');
-                const rawWa = waIdx >= 0 ? String(row[waIdx]) : '';
-                const cleanWa = rawWa.replace(/[^0-9]/g, '');
-
-                let badgeClass = "bg-slate-100 text-slate-800";
-                if (status === "BOOKED") badgeClass = "bg-emerald-100 text-emerald-800";
-                if (status === "FOLLOW UP" || status === "CONTACTED") badgeClass = "bg-amber-100 text-amber-800";
-                if (status === "LOST" || status === "CANCELLED") badgeClass = "bg-red-100 text-red-800";
+                let badge = "bg-slate-100 text-slate-800";
+                if (status === "BOOKED") badge = "bg-emerald-100 text-emerald-800";
+                if (status === "FOLLOW UP" || status === "CONTACTED") badge = "bg-amber-100 text-amber-800";
+                if (status === "LOST" || status === "CANCELLED") badge = "bg-red-100 text-red-800";
 
                 return `
-                    <tr class="hover:bg-slate-50 cursor-pointer transition" onclick="selectLeadRow(${index})">
+                    <tr class="hover:bg-slate-50 cursor-pointer transition" onclick="selectLead(${idx})">
                         <td class="p-3 font-semibold text-slate-900">
                             ${name}
                             <div class="text-[10px] text-slate-400 font-normal">${cleanWa ? '+' + cleanWa : ''}</div>
                         </td>
                         <td class="p-3">${goal}</td>
                         <td class="p-3">${pax} Pax</td>
-                        <td class="p-3"><span class="${badgeClass} font-semibold px-2 py-0.5 rounded-full text-[10px]">${status}</span></td>
+                        <td class="p-3"><span class="${badge} font-semibold px-2 py-0.5 rounded-full text-[10px]">${status}</span></td>
+                        <td class="p-3">${pic}</td>
                         <td class="p-3 text-center">
                             ${cleanWa ? `<a href="https://wa.me/${cleanWa}" target="_blank" onclick="event.stopPropagation()" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-2.5 py-1 rounded-lg text-[10px] font-semibold inline-flex items-center gap-1">WA</a>` : '-'}
                         </td>
@@ -258,42 +243,58 @@
                 `;
             }).join('');
 
-            if (rows.length > 0) selectLeadRow(0);
+            if (leads.length > 0) selectLead(0);
         }
 
-        // TAMPILKAN SELURUH FIELD SPREADSHEET DI PANEL DETAIL
-        function selectLeadRow(index) {
-            const row = globalRows[index];
-            if (!row) return;
+        // PILIH LEAD DAN TAMPILKAN PANEL DETAIL + RIWAYAT FOLLOW UP
+        function selectLead(idx) {
+            const item = rawLeads[idx];
+            if (!item) return;
 
-            const nameIdx = globalHeaders.findIndex(h => h.toLowerCase().includes('nama'));
-            const idIdx = globalHeaders.findIndex(h => h.toLowerCase().includes('id'));
-            const statusIdx = globalHeaders.findIndex(h => h.toLowerCase().includes('status'));
+            const idLead = item["ID Lead"] || "-";
+            document.getElementById('det-id').textContent = 'ID: ' + idLead;
+            document.getElementById('det-status').textContent = item["Status Pipeline"] || "NEW LEAD";
+            document.getElementById('det-nama').textContent = item["Nama Lead"] || item["Nama Leads"] || "Detail Lead";
+            document.getElementById('det-kontak').textContent = (item["No. WA"] || item["No WA Leads"] || '-') + ' • ' + (item["Kota Asal"] || '-');
 
-            document.getElementById('det-id').textContent = idIdx >= 0 ? row[idIdx] : 'LEAD-' + (index + 1);
-            document.getElementById('det-status').textContent = statusIdx >= 0 ? row[statusIdx] : 'NEW LEAD';
-            document.getElementById('det-nama').textContent = nameIdx >= 0 ? row[nameIdx] : 'Detail Lead';
+            // Render Rincian Kolom Tab "CRM"
+            const fieldsContainer = document.getElementById('det-fields-container');
+            fieldsContainer.innerHTML = Object.keys(item).map(key => `
+                <div>
+                    <span class="text-slate-400 block text-[10px]">${key}</span>
+                    <strong class="text-slate-700 text-xs">${item[key] || '-'}</strong>
+                </div>
+            `).join('');
 
-            const container = document.getElementById('det-fields-container');
-            container.innerHTML = globalHeaders.map((header, hIdx) => {
-                const val = row[hIdx] !== undefined && row[hIdx] !== "" ? row[hIdx] : "-";
-                return `
-                    <div>
-                        <span class="text-slate-400 block text-[10px]">${header}</span>
-                        <strong class="text-slate-700 text-xs">${val}</strong>
+            // Render Riwayat dari Tab "CRM Follow-up" berdasarkan ID Lead
+            const fuContainer = document.getElementById('det-followup-container');
+            const matchedFu = rawFollowups.filter(f => String(f["ID Lead"]).trim() === String(idLead).trim());
+
+            if (matchedFu.length === 0) {
+                fuContainer.innerHTML = `<div class="text-slate-400 text-xs italic bg-slate-50 p-2.5 rounded-xl border border-slate-100">Belum ada riwayat follow-up.</div>`;
+            } else {
+                fuContainer.innerHTML = matchedFu.map(f => `
+                    <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100 text-xs">
+                        <div class="flex justify-between font-semibold text-slate-700">
+                            <span>${f["PIC Follow-up"] || 'Admin'}</span>
+                            <span class="text-[10px] text-slate-400">${f["Tanggal Follow-up"] || ''}</span>
+                        </div>
+                        <p class="text-slate-600 mt-1">${f["Catatan Follow-up"] || '-'}</p>
                     </div>
-                `;
-            }).join('');
+                `).join('');
+            }
         }
 
         function filterLeads() {
             const query = document.getElementById('search-input').value.toLowerCase();
-            const filtered = globalRows.filter(row => row.some(cell => String(cell).toLowerCase().includes(query)));
-            renderCrmTable(filtered);
+            const filtered = rawLeads.filter(item => {
+                return Object.values(item).some(val => String(val).toLowerCase().includes(query));
+            });
+            renderTable(filtered);
         }
 
-        // Panggil data awal
-        loadCrmDataViaBridge();
+        // Panggil data langsung saat halaman dibuka
+        fetchCrmDirect();
     </script>
 </body>
 </html>
