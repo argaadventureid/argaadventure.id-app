@@ -6,21 +6,72 @@
     <meta name="theme-color" content="#0b352b" />
     <title>Arga 2.0 | Internal</title>
     <style>
-      :root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #18352d; background: #f3f6f1; }
+      :root {
+        color-scheme: light;
+        font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: #18352d;
+        background: #f3f6f1;
+      }
       * { box-sizing: border-box; }
-      body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 24px; }
-      main { width: min(100%, 460px); background: #fff; border: 1px solid #e2e9e2; border-radius: 20px; padding: 32px; box-shadow: 0 18px 55px #17352b12; }
-      .mark { width: 48px; height: 48px; display: grid; place-items: center; border-radius: 15px; background: #0b352b; color: white; font-weight: 800; letter-spacing: -.05em; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+      }
+      main {
+        width: min(100%, 460px);
+        background: #fff;
+        border: 1px solid #e2e9e2;
+        border-radius: 20px;
+        padding: 32px;
+        box-shadow: 0 18px 55px #17352b12;
+      }
+      .mark {
+        width: 48px;
+        height: 48px;
+        display: grid;
+        place-items: center;
+        border-radius: 15px;
+        background: #0b352b;
+        color: white;
+        font-weight: 800;
+      }
       h1 { font-size: 25px; margin: 22px 0 8px; }
       p { color: #5c7069; line-height: 1.55; margin: 0 0 20px; }
-      button { width: 100%; display: flex; align-items: center; justify-content: center; gap: 12px; min-height: 48px; border: 1px solid #d6dfd9; border-radius: 10px; background: white; color: #18352d; font-size: 15px; font-weight: 650; cursor: pointer; }
+      button {
+        width: 100%;
+        min-height: 48px;
+        border: 1px solid #d6dfd9;
+        border-radius: 10px;
+        background: white;
+        color: #18352d;
+        font-size: 15px;
+        font-weight: 650;
+        cursor: pointer;
+      }
       button:hover { background: #f7faf7; }
       button:disabled { opacity: .6; cursor: wait; }
-      #status { display: none; margin-top: 18px; border-radius: 10px; padding: 13px 14px; font-size: 14px; line-height: 1.5; }
+      #status {
+        display: none;
+        margin-top: 18px;
+        border-radius: 10px;
+        padding: 13px 14px;
+        font-size: 14px;
+        line-height: 1.5;
+      }
       #status.visible { display: block; }
       #status.info { background: #eef5f0; color: #315a49; }
       #status.error { background: #fff0ed; color: #8a3023; }
-      #user { display: none; margin-top: 18px; border-top: 1px solid #e8ede9; padding-top: 18px; font-size: 14px; color: #5c7069; }
+      #user {
+        display: none;
+        margin-top: 18px;
+        border-top: 1px solid #e8ede9;
+        padding-top: 18px;
+        font-size: 14px;
+        color: #5c7069;
+      }
       #user.visible { display: block; }
       #signout { margin-top: 12px; }
       .note { font-size: 12px; margin: 22px 0 0; }
@@ -29,22 +80,39 @@
   <body>
     <main>
       <div class="mark" aria-hidden="true">A</div>
-      <h1>Arga Adventure 2.0</h1>
+      <h1>Arga 2.0</h1>
       <p>Masuk dengan akun Google yang didaftarkan untuk tim Arga Adventure.</p>
-      <button id="signin" type="button">
-        <svg width="19" height="19" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5Z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.76 7.18l7.73 6C44.42 38.05 46.98 31.95 46.98 24.55Z"/><path fill="#FBBC05" d="M10.53 28.59A14.4 14.4 0 0 1 9.75 24c0-1.59.27-3.13.76-4.59l-7.98-6.19A23.9 23.9 0 0 0 0 24c0 3.87.93 7.53 2.56 10.78l7.97-6.19Z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.91-5.8l-7.73-6c-2.15 1.45-4.9 2.3-8.18 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48Z"/></svg>
-        Masuk dengan Google
-      </button>
+
+      <button id="signin" type="button">Masuk dengan Google</button>
       <div id="status" role="status" aria-live="polite"></div>
-      <div id="user"><span id="email"></span><button id="signout" type="button">Keluar</button></div>
-      <p class="note">Akses ke data internal baru dibuka setelah backend memeriksa daftar anggota dan role.</p>
+
+      <div id="user">
+        <span id="email"></span>
+        <button id="signout" type="button">Keluar</button>
+      </div>
+
+      <p class="note">
+        Akses ke data internal baru dibuka setelah backend memeriksa daftar anggota dan role.
+      </p>
     </main>
+
+    <iframe
+      id="access-frame"
+      name="access-frame"
+      title="Pemeriksaan akses Arga Adventure"
+      hidden>
+    </iframe>
 
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-      import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+      import {
+        getAuth,
+        GoogleAuthProvider,
+        signInWithPopup,
+        signOut,
+        onAuthStateChanged
+      } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 
-      // Ganti nilai placeholder dengan konfigurasi aplikasi web dari Firebase Console.
       const firebaseConfig = {
         apiKey: "AIzaSyBydyEGrTsFjL_icqKEiWj9AU1ZG3sQHqs",
         authDomain: "arga-adventure-internal-app.firebaseapp.com",
@@ -52,13 +120,15 @@
         appId: "1:830680121802:web:0e3a0175c4d59fb8468f33"
       };
 
-      // Biarkan kosong sampai endpoint backend whitelist Arga benar-benar siap.
-      const ACCESS_CHECK_URL = "";
+      const ACCESS_CHECK_URL =
+        "https://script.google.com/macros/s/AKfycbxZZNm_K08oTnOThAJfzCiT_OMOWAQSTNTiiR3bxwAsSZrMc3a4CLRTMggXoMn25Zqzpg/exec";
 
       const statusBox = document.querySelector("#status");
       const signInButton = document.querySelector("#signin");
       const userBox = document.querySelector("#user");
       const emailBox = document.querySelector("#email");
+      const accessFrame = document.querySelector("#access-frame");
+
       const auth = getAuth(initializeApp(firebaseConfig));
       const provider = new GoogleAuthProvider();
 
@@ -68,42 +138,105 @@
       }
 
       async function checkTeamAccess(user) {
-        if (!ACCESS_CHECK_URL) {
-          showStatus("Login Google berhasil. Pemeriksaan whitelist oleh backend belum dipasang, jadi data internal tetap terkunci.");
-          return;
-        }
         const idToken = await user.getIdToken();
-        const response = await fetch(ACCESS_CHECK_URL, {
-          method: "GET",
-          headers: { Authorization: `Bearer ${idToken}` }
+        const nonce = crypto.randomUUID().replaceAll("-", "");
+
+        showStatus("Memeriksa daftar akses Arga…");
+
+        const result = await new Promise((resolve, reject) => {
+          const timeout = setTimeout(() => {
+            window.removeEventListener("message", onMessage);
+            reject(new Error("Pemeriksaan akses terlalu lama. Muat ulang halaman lalu coba lagi."));
+          }, 20000);
+
+          function onMessage(event) {
+            const trustedAppsScriptOrigin =
+              /^https:\/\/(?:[a-z0-9-]+-)?script\.googleusercontent\.com$/i.test(event.origin) ||
+              event.origin === "https://script.google.com";
+
+            if (event.source !== accessFrame.contentWindow || !trustedAppsScriptOrigin) {
+              return;
+            }
+
+            const message = event.data;
+            if (
+              !message ||
+              message.channel !== "arga-access" ||
+              message.nonce !== nonce
+            ) {
+              return;
+            }
+
+            clearTimeout(timeout);
+            window.removeEventListener("message", onMessage);
+            resolve(message.result);
+          }
+
+          window.addEventListener("message", onMessage);
+
+          const form = document.createElement("form");
+          form.method = "POST";
+          form.action = ACCESS_CHECK_URL;
+          form.target = "access-frame";
+          form.enctype = "application/x-www-form-urlencoded";
+
+          const fields = {
+            payload: JSON.stringify({ idToken }),
+            nonce
+          };
+
+          for (const [name, value] of Object.entries(fields)) {
+            const input = document.createElement("input");
+            input.type = "hidden";
+            input.name = name;
+            input.value = value;
+            form.appendChild(input);
+          }
+
+          document.body.appendChild(form);
+          form.submit();
+          form.remove();
         });
-        if (response.status === 403) throw new Error("Akun ini belum mendapat izin dari Admin Arga.");
-        if (!response.ok) throw new Error("Pemeriksaan akses gagal. Coba lagi atau hubungi Admin Arga.");
-        const access = await response.json();
-        if (access.allowed !== true) throw new Error("Akun ini belum mendapat izin dari Admin Arga.");
-        showStatus(`Akses disetujui${access.role ? ` · Role: ${access.role}` : ""}.`);
+
+        if (!result || result.allowed !== true) {
+          throw new Error(
+            (result && result.message) ||
+            "Akun ini belum mendapat izin dari Admin Arga Adventure."
+          );
+        }
+
+        showStatus(`Akses disetujui · Role: ${result.role}`);
       }
 
       signInButton.addEventListener("click", async () => {
         signInButton.disabled = true;
         try {
-          const result = await signInWithPopup(auth, provider);
-          await checkTeamAccess(result.user);
+          await signInWithPopup(auth, provider);
         } catch (error) {
-          showStatus(error.message || "Login tidak berhasil. Silakan coba lagi.", "error");
+          showStatus(
+            error.message || "Login tidak berhasil. Silakan coba lagi.",
+            "error"
+          );
         } finally {
           signInButton.disabled = false;
         }
       });
 
-      document.querySelector("#signout").addEventListener("click", () => signOut(auth));
+      document.querySelector("#signout").addEventListener("click", () => {
+        signOut(auth);
+      });
+
       onAuthStateChanged(auth, async (user) => {
         userBox.classList.toggle("visible", Boolean(user));
         signInButton.hidden = Boolean(user);
+
         if (user) {
           emailBox.textContent = user.email || "Akun Google";
-          try { await checkTeamAccess(user); }
-          catch (error) { showStatus(error.message, "error"); }
+          try {
+            await checkTeamAccess(user);
+          } catch (error) {
+            showStatus(error.message, "error");
+          }
         } else {
           statusBox.className = "";
         }
