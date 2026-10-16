@@ -10,109 +10,129 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+<body class="bg-slate-100 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
 
-    <!-- CONTAINER UTAMA -->
-    <div id="app" class="flex-1 flex flex-col justify-center items-center p-4">
+    <!-- CONTAINER UTAMA (FULL SCREEN) -->
+    <div id="app" class="flex-1 flex flex-col w-full">
 
         <!-- 1. TAMPILAN LOADING / INISIALISASI -->
-        <div id="view-loading" class="hidden text-center">
+        <div id="view-loading" class="hidden flex-1 flex flex-col justify-center items-center p-4">
             <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-emerald-600 border-t-transparent mb-2"></div>
             <p class="text-sm text-slate-500">Memeriksa sesi...</p>
         </div>
 
         <!-- 2. TAMPILAN LOGIN (Disembunyikan default) -->
-        <div id="view-login" class="hidden max-w-md w-full bg-white rounded-2xl shadow-xl p-8 border border-slate-100 text-center">
-            <div class="mb-6">
-                <span class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">Arga 2.0 Internal</span>
-                <h1 class="text-2xl font-bold mt-2 text-slate-900">Arga Adventure</h1>
-                <p class="text-sm text-slate-500 mt-1">Silakan masuk menggunakan akun resmi tim.</p>
+        <div id="view-login" class="hidden flex-1 flex flex-col justify-center items-center p-4">
+            <div class="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 border border-slate-100 text-center">
+                <div class="mb-6">
+                    <span class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">Arga 2.0 Internal</span>
+                    <h1 class="text-2xl font-bold mt-2 text-slate-900">Arga Adventure</h1>
+                    <p class="text-sm text-slate-500 mt-1">Silakan masuk menggunakan akun resmi tim.</p>
+                </div>
+                
+                <button id="btn-login" onclick="loginWithGoogle()" class="w-full flex items-center justify-center gap-3 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-medium py-2.5 px-4 rounded-xl transition shadow-sm">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                    </svg>
+                    Masuk dengan Google
+                </button>
+                <p id="login-error" class="text-xs text-red-500 mt-4 hidden"></p>
             </div>
-            
-            <button id="btn-login" onclick="loginWithGoogle()" class="w-full flex items-center justify-center gap-3 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-medium py-2.5 px-4 rounded-xl transition shadow-sm">
-                <svg class="w-5 h-5" viewBox="0 0 24 24">
-                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-                </svg>
-                Masuk dengan Google
-            </button>
-            <p id="login-error" class="text-xs text-red-500 mt-4 hidden"></p>
         </div>
 
-        <!-- 3. TAMPILAN DASHBOARD ADMIN (Diaktifkan langsung untuk Preview UI) -->
-        <div id="view-admin" class="w-full max-w-6xl bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden my-6">
-            <!-- Header Dashboard -->
-            <header class="bg-slate-900 text-white px-6 py-4 flex justify-between items-center">
-                <div>
-                    <span class="text-xs text-emerald-400 font-semibold uppercase tracking-wider">Admin Panel (Preview Mode)</span>
-                    <h2 class="text-xl font-bold">Arga Adventure 2.0</h2>
+        <!-- 3. TAMPILAN DASHBOARD ADMIN (FULL SCREEN) -->
+        <div id="view-admin" class="flex-1 flex flex-col w-full bg-white">
+            <!-- Header Dashboard Full-Screen -->
+            <header class="bg-slate-900 text-white px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4 shadow-md">
+                <div class="flex items-center gap-6 w-full md:w-auto justify-between md:justify-start">
+                    <div>
+                        <span class="text-xs text-emerald-400 font-semibold uppercase tracking-wider">Admin Panel (Preview)</span>
+                        <h2 class="text-xl font-bold">Arga Adventure 2.0</h2>
+                    </div>
+                    <!-- Menu Navigasi Utama -->
+                    <nav class="hidden md:flex items-center gap-2 bg-slate-800/80 p-1 rounded-xl border border-slate-700">
+                        <button class="bg-emerald-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition shadow-sm">Dashboard</button>
+                        <button class="hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-medium px-3 py-1.5 rounded-lg transition">CRM</button>
+                        <button class="hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-medium px-3 py-1.5 rounded-lg transition">Trip Event</button>
+                        <button class="hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-medium px-3 py-1.5 rounded-lg transition">Finance</button>
+                    </nav>
                 </div>
-                <div class="flex items-center gap-4">
-                    <span id="user-email-display" class="text-sm text-slate-300 hidden md:inline">preview@argaadventure.id</span>
+                
+                <div class="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
+                    <span id="user-email-display" class="text-sm text-slate-300">preview@argaadventure.id</span>
                     <button onclick="logout()" class="bg-slate-800 hover:bg-slate-700 text-sm px-3 py-1.5 rounded-lg transition border border-slate-700">Keluar</button>
                 </div>
             </header>
 
-            <!-- Konten Utama Admin -->
-            <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Mobile Navigasi (Baris kedua untuk layar kecil) -->
+            <div class="md:hidden flex items-center justify-around bg-slate-800 text-white py-2 border-b border-slate-700">
+                <button class="text-emerald-400 text-xs font-semibold">Dashboard</button>
+                <button class="text-slate-300 text-xs font-medium">CRM</button>
+                <button class="text-slate-300 text-xs font-medium">Trip Event</button>
+                <button class="text-slate-300 text-xs font-medium">Finance</button>
+            </div>
+
+            <!-- Konten Utama Admin (Full Width Grid) -->
+            <main class="flex-1 p-6 md:p-8 space-y-6 max-w-7xl mx-auto w-full">
                 <!-- Card Statistik / Ringkasan -->
-                <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-5">
-                    <h3 class="text-emerald-900 font-semibold text-sm">Status Sistem</h3>
-                    <p class="text-2xl font-bold text-emerald-700 mt-1">Aktif & Terhubung</p>
-                    <p class="text-xs text-emerald-600 mt-2">Sinkronisasi Google Sheet Lancar</p>
-                </div>
-                <div class="bg-blue-50 border border-blue-100 rounded-xl p-5">
-                    <h3 class="text-blue-900 font-semibold text-sm">Hak Akses</h3>
-                    <p class="text-2xl font-bold text-blue-700 mt-1">Administrator</p>
-                    <p class="text-xs text-blue-600 mt-2">Akses penuh modul operasional</p>
-                </div>
-                <div class="bg-amber-50 border border-amber-100 rounded-xl p-5">
-                    <h3 class="text-amber-900 font-semibold text-sm">Modul Cepat</h3>
-                    <div class="mt-3 flex gap-2">
-                        <button class="bg-amber-600 hover:bg-amber-700 text-white text-xs px-3 py-1.5 rounded-lg font-medium transition">Kelola Trip</button>
-                        <button class="bg-amber-600 hover:bg-amber-700 text-white text-xs px-3 py-1.5 rounded-lg font-medium transition">Whitelists</button>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-6 shadow-sm">
+                        <h3 class="text-emerald-900 font-semibold text-sm">Status Sistem</h3>
+                        <p class="text-3xl font-bold text-emerald-700 mt-2">Aktif & Terhubung</p>
+                        <p class="text-xs text-emerald-600 mt-2">Sinkronisasi Google Sheet Lancar</p>
+                    </div>
+                    <div class="bg-blue-50 border border-blue-100 rounded-2xl p-6 shadow-sm">
+                        <h3 class="text-blue-900 font-semibold text-sm">Hak Akses</h3>
+                        <p class="text-3xl font-bold text-blue-700 mt-2">Administrator</p>
+                        <p class="text-xs text-blue-600 mt-2">Akses penuh modul operasional</p>
+                    </div>
+                    <div class="bg-amber-50 border border-amber-100 rounded-2xl p-6 shadow-sm">
+                        <h3 class="text-amber-900 font-semibold text-sm">Aksi Cepat</h3>
+                        <div class="mt-4 flex gap-2">
+                            <button class="bg-amber-600 hover:bg-amber-700 text-white text-xs px-3.5 py-2 rounded-xl font-medium transition shadow-sm">+ Buat Trip Baru</button>
+                            <button class="bg-amber-600 hover:bg-amber-700 text-white text-xs px-3.5 py-2 rounded-xl font-medium transition shadow-sm">Kelola Whitelist</button>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Area Kerja / Tabel Data -->
-            <div class="px-6 pb-6">
-                <div class="border border-slate-200 rounded-xl p-6 bg-slate-50">
-                    <h3 class="font-bold text-slate-700 mb-2">Aktivitas & Kontrol Akses Terakhir</h3>
-                    <p class="text-sm text-slate-500">Modul manajemen user dari Google Sheet privat akan ditampilkan di sini.</p>
+                <!-- Area Kerja / Tabel Data Full Width -->
+                <div class="border border-slate-200 rounded-2xl p-6 bg-slate-50 shadow-sm min-h-[400px]">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-slate-800 text-lg">Aktivitas & Kontrol Akses Terakhir</h3>
+                        <span class="text-xs text-slate-500 bg-white border border-slate-200 px-3 py-1.5 rounded-lg shadow-sm">Live Data from Google Sheet</span>
+                    </div>
+                    <p class="text-sm text-slate-500">Modul manajemen operasional, data pelanggan CRM, penjadwalan Trip Event, dan pencatatan Finance akan dimuat di area ini secara dinamis.</p>
                 </div>
-            </div>
+            </main>
         </div>
 
-        <!-- 4. TAMPILAN AKSES DITOLAK (Jika email tidak terdaftar/aktif) -->
-        <div id="view-unauthorized" class="hidden max-w-md w-full bg-white rounded-2xl shadow-xl p-8 border border-slate-100 text-center">
-            <div class="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">!</div>
-            <h2 class="text-xl font-bold text-slate-900">Akses Ditolak</h2>
-            <p class="text-sm text-slate-500 mt-2">Akun Google Anda tidak terdaftar atau tidak aktif di daftar akses internal Arga Adventure.</p>
-            <button onclick="logout()" class="mt-6 bg-slate-900 hover:bg-slate-800 text-white text-sm px-4 py-2 rounded-xl transition">Ganti Akun / Keluar</button>
+        <!-- 4. TAMPILAN AKSES DITOLAK -->
+        <div id="view-unauthorized" class="hidden flex-1 flex flex-col justify-center items-center p-4">
+            <div class="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 border border-slate-100 text-center">
+                <div class="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">!</div>
+                <h2 class="text-xl font-bold text-slate-900">Akses Ditolak</h2>
+                <p class="text-sm text-slate-500 mt-2">Akun Google Anda tidak terdaftar atau tidak aktif di daftar akses internal Arga Adventure.</p>
+                <button onclick="logout()" class="mt-6 bg-slate-900 hover:bg-slate-800 text-white text-sm px-4 py-2 rounded-xl transition">Ganti Akun / Keluar</button>
+            </div>
         </div>
 
     </div>
 
     <!-- SCRIPT KONFIGURASI & LOGIKA -->
     <script>
-        // --- KONFIGURASI FIREBASE ANDA ---
         const firebaseConfig = {
             apiKey: "GANTI_DENGAN_API_KEY_FIREBASE",
             authDomain: "GANTI_DENGAN_AUTH_DOMAIN",
             projectId: "GANTI_DENGAN_PROJECT_ID"
         };
 
-        // Inisialisasi Firebase
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
-
-        // URL Web App Google Apps Script Anda
         const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycb.../exec";
 
-        // DOM Elements
         const viewLoading = document.getElementById('view-loading');
         const viewLogin = document.getElementById('view-login');
         const viewAdmin = document.getElementById('view-admin');
@@ -132,15 +152,9 @@
             if (viewName === 'unauthorized') viewUnauthorized.classList.remove('hidden');
         }
 
-        /* 
-          -- PANTAU STATUS AUTH DI-BYPASS SEMENTARA UNTUK PREVIEW UI --
-          auth.onAuthStateChanged(async (user) => { ... });
-        */
-
-        // PAKSA TAMPILKAN DASHBOARD ADMIN UNTUK KEPERLUAN UI PREVIEW
+        // PAKSA TAMPILKAN DASHBOARD ADMIN FULL-SCREEN UNTUK UI PREVIEW
         switchView('admin');
 
-        // Fungsi Tombol Login Google
         function loginWithGoogle() {
             loginError.classList.add('hidden');
             const provider = new firebase.auth.GoogleAuthProvider();
@@ -150,10 +164,8 @@
             });
         }
 
-        // Fungsi Logout
         function logout() {
             auth.signOut();
-            // Jika nanti sudah live, arahkan kembali ke view login
             switchView('login');
         }
     </script>
