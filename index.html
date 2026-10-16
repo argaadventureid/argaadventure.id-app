@@ -60,6 +60,7 @@
         padding: 13px 14px;
         font-size: 14px;
         line-height: 1.5;
+        word-break: break-word;
       }
       #status.visible { display: block; }
       #status.info { background: #eef5f0; color: #315a49; }
@@ -127,6 +128,7 @@
       const signInButton = document.querySelector("#signin");
       const userBox = document.querySelector("#user");
       const emailBox = document.querySelector("#email");
+      const accessFrame = document.querySelector("#access-frame");
 
       const auth = getAuth(initializeApp(firebaseConfig));
       const provider = new GoogleAuthProvider();
@@ -142,64 +144,86 @@
 
         showStatus("Memeriksa daftar akses Arga…");
 
-        const result = await new Promise((resolve, reject) => {
-          const timeout = setTimeout(() => {
-            window.removeEventListener("message", onMessage);
-            reject(new Error("Pemeriksaan akses terlalu lama. Muat ulang halaman lalu coba lagi."));
-          }, 20000);
+        // --- DEBUG: catat apa saja yang terjadi ---
+        const debug = { frameLoaded: false, seen: [] };
+        const onFrameLoad = () => { debug.frameLoaded = true; };
+        accessFrame.addEventListener("load", onFrameLoad);
+        const onAnyMessage = (event) => {
+          const d = event.data;
+          let info = "tipe:" + typeof d;
+          if (d && typeof d === "object") {
+            info = "channel:" + d.channel + ", nonceCocok:" + (d.nonce === nonce);
+          }
+          debug.seen.push(event.origin + " (" + info + ")");
+        };
+        window.addEventListener("message", onAnyMessage);
+        // --- akhir DEBUG ---
 
-          function onMessage(event) {
-            const trustedAppsScriptOrigin =
-              /^https:\/\/(?:[a-z0-9-]+-)?script\.googleusercontent\.com$/i.test(event.origin) ||
-              event.origin === "https://script.google.com";
+        let result;
+        try {
+          result = await new Promise((resolve, reject) => {
+            const timeout = setTimeout(() => {
+              window.removeEventListener("message", onMessage);
+              reject(new Error(
+                "Pemeriksaan akses terlalu lama. " +
+                "[DEBUG] iframe termuat: " + (debug.frameLoaded ? "ya" : "tidak") +
+                "; pesan masuk: " + debug.seen.length +
+                (debug.seen.length ? " -> " + debug.seen.join(" | ") : "")
+              ));
+            }, 20000);
 
-            // PERBAIKAN: pengecekan event.source dihapus. Pesan datang dari
-            // iframe sandbox Google di dalam access-frame, jadi source-nya
-            // bukan accessFrame.contentWindow. Keamanan tetap dijaga oleh
-            // pengecekan origin dan nonce acak di bawah.
-            if (!trustedAppsScriptOrigin) {
-              return;
+            function onMessage(event) {
+              const trustedAppsScriptOrigin =
+                /^https:\/\/(?:[a-z0-9-]+-)?script\.googleusercontent\.com$/i.test(event.origin) ||
+                event.origin === "https://script.google.com";
+
+              if (!trustedAppsScriptOrigin) {
+                return;
+              }
+
+              const message = event.data;
+              if (
+                !message ||
+                message.channel !== "arga-access" ||
+                message.nonce !== nonce
+              ) {
+                return;
+              }
+
+              clearTimeout(timeout);
+              window.removeEventListener("message", onMessage);
+              resolve(message.result);
             }
 
-            const message = event.data;
-            if (
-              !message ||
-              message.channel !== "arga-access" ||
-              message.nonce !== nonce
-            ) {
-              return;
+            window.addEventListener("message", onMessage);
+
+            const form = document.createElement("form");
+            form.method = "POST";
+            form.action = ACCESS_CHECK_URL;
+            form.target = "access-frame";
+            form.enctype = "application/x-www-form-urlencoded";
+
+            const fields = {
+              payload: JSON.stringify({ idToken }),
+              nonce
+            };
+
+            for (const [name, value] of Object.entries(fields)) {
+              const input = document.createElement("input");
+              input.type = "hidden";
+              input.name = name;
+              input.value = value;
+              form.appendChild(input);
             }
 
-            clearTimeout(timeout);
-            window.removeEventListener("message", onMessage);
-            resolve(message.result);
-          }
-
-          window.addEventListener("message", onMessage);
-
-          const form = document.createElement("form");
-          form.method = "POST";
-          form.action = ACCESS_CHECK_URL;
-          form.target = "access-frame";
-          form.enctype = "application/x-www-form-urlencoded";
-
-          const fields = {
-            payload: JSON.stringify({ idToken }),
-            nonce
-          };
-
-          for (const [name, value] of Object.entries(fields)) {
-            const input = document.createElement("input");
-            input.type = "hidden";
-            input.name = name;
-            input.value = value;
-            form.appendChild(input);
-          }
-
-          document.body.appendChild(form);
-          form.submit();
-          form.remove();
-        });
+            document.body.appendChild(form);
+            form.submit();
+            form.remove();
+          });
+        } finally {
+          window.removeEventListener("message", onAnyMessage);
+          accessFrame.removeEventListener("load", onFrameLoad);
+        }
 
         if (!result || result.allowed !== true) {
           throw new Error(
